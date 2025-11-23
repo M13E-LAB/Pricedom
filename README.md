@@ -11,7 +11,7 @@
 
 Laravel-based social platform for food sharing and nutrition tracking.
 
-## 🚀 Quick Railway Deployment with Railpack
+## Quick Railway Deployment with Railpack
 
 ### Option 1: Zero-Config Deployment (Recommended)
 
@@ -30,7 +30,7 @@ Laravel-based social platform for food sharing and nutrition tracking.
 
 If you prefer manual control, see `Dockerfile` in the repo.
 
-## 🛠️ Local Development
+## Local Development
 
 ```bash
 # Clone and setup
@@ -51,15 +51,15 @@ php artisan migrate
 php artisan serve & npm run dev
 ```
 
-## 📝 Features
+## Features
 
-- 🥘 Social food feed
-- 📊 Nutrition analysis  
-- 👥 User profiles
-- 🔍 Product search
-- 📱 Responsive design
+- Social food feed
+- Nutrition analysis  
+- User profiles
+- Product search
+- Responsive design
 
-## 🚨 Troubleshooting Railway
+## Troubleshooting Railway
 
 ### Health Check Issues
 - Use health check path: `/up`
@@ -73,7 +73,7 @@ php artisan serve & npm run dev
 - Use SQLite for simplicity: `DB_CONNECTION=sqlite`
 - Set `DB_DATABASE=/tmp/database.sqlite`
 
-## 📚 Tech Stack
+## Tech Stack
 
 - **Backend:** Laravel 11, PHP 8.2
 - **Frontend:** Blade, Tailwind CSS, Vite

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Partager un Repas - Zyma')
+@section('title', 'Partager un Repas - Pricedom')
 
 @section('content')
 <div class="min-h-screen">
@@ -160,8 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Traitement silencieux de l'image
 
-        // Utiliser le compresseur Zyma
-        window.zymaCompressor.compressImage(file, function(processedFile) {
+        // Utiliser le compresseur Pricedom
+        window.pricedomCompressor.compressImage(file, function(processedFile) {
             compressedFile = processedFile;
             
             // Mettre à jour l'input avec le fichier compressé

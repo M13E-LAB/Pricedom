@@ -5,7 +5,7 @@
     <div class="w-full max-w-md mx-auto">
         <div class="bg-black/60 border border-white/10 rounded-2xl shadow-2xl p-8">
             <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-2">
-                <span>🔑</span> Connexion <span class="text-orange-400">ZYMA</span>
+                <span>🔑</span> Connexion <span class="text-orange-400">PRICEDOM</span>
             </h2>
             
             @if (session('status'))

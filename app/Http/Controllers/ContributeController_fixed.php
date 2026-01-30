@@ -6,59 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 
 class ContributeController extends Controller
 {
     public function index()
     {
-        // Récupérer les statistiques de l'utilisateur connecté
-        $user = auth()->user();
-        
-        if ($user) {
-            $totalContributions = $user->contributions()->count();
-            $badgesCount = $user->badges()->count();
-            
-            $stats = [
-                'total_contributions' => $totalContributions,
-                'badges_count' => $badgesCount,
-                'recent_contributions' => $user->contributions()->latest()->take(5)->get(),
-                'completion_percentage' => min(100, ($totalContributions * 10)), // 10% par contribution, max 100%
-                'next_badge' => [
-                    'name' => $badgesCount < 5 ? 'Contributeur Expert' : 'Master Scanner',
-                    'emoji' => $badgesCount < 5 ? '🏆' : '👑',
-                    'threshold' => ($badgesCount + 1) * 5,
-                    'progress' => min(100, ($totalContributions / (($badgesCount + 1) * 5)) * 100),
-                    'remaining' => max(0, (($badgesCount + 1) * 5) - $totalContributions)
-                ],
-                'points' => $totalContributions * 10 + $badgesCount * 50,
-                'level' => floor($totalContributions / 5) + 1,
-                'scan_count' => $totalContributions, // Approximation
-                'manual_count' => 0, // À implémenter si nécessaire
-                'all_badges' => $user->badges()->take(5)->get(), // Les 5 derniers badges
-            ];
-        } else {
-            $stats = [
-                'total_contributions' => 0,
-                'badges_count' => 0,
-                'recent_contributions' => collect(),
-                'completion_percentage' => 0,
-                'next_badge' => [
-                    'name' => 'Premier Contributeur',
-                    'emoji' => '🌟',
-                    'threshold' => 5,
-                    'progress' => 0,
-                    'remaining' => 5
-                ],
-                'points' => 0,
-                'level' => 1,
-                'scan_count' => 0,
-                'manual_count' => 0,
-                'all_badges' => collect(), // Collection vide pour utilisateur non connecté
-            ];
-        }
-        
-        return view('contribute.index', compact('stats'));
+        return view('contribute.index');
     }
 
     public function scan()
@@ -79,7 +32,6 @@ class ContributeController extends Controller
 
         try {
             Log::info('🎫 Début analyse ticket avec OpenAI GPT-4 Vision');
-            Log::info('📋 Request data', ['files' => $request->allFiles(), 'has_image' => $request->hasFile('ticket_image')]);
             
             // Utiliser OpenAI API
             $apiKey = env('OPENAI_API_KEY');
@@ -175,13 +127,12 @@ Instructions :
             if ($response->failed()) {
                 Log::error('❌ Erreur API OpenAI', [
                     'status' => $response->status(),
-                    'body' => $response->body(),
-                    'headers' => $response->headers()
+                    'body' => $response->body()
                 ]);
                 Storage::disk('public')->delete($imagePath);
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur API OpenAI: ' . $response->status() . ' - ' . substr($response->body(), 0, 200)
+                    'message' => 'Erreur de connexion. Vérifiez votre connexion internet.'
                 ], 500);
             }
 
@@ -195,7 +146,7 @@ Instructions :
                     'message' => 'Format de réponse invalide.'
                 ], 500);
             }
-
+            
             $content = $responseData['choices'][0]['message']['content'];
             Log::info('📄 Contenu reçu d\'OpenAI', ['content' => substr($content, 0, 200)]);
             

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ajouter un prix manuellement - Zyma')
+@section('title', 'Ajouter un prix manuellement - Pricedom')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-8 px-4">
@@ -215,8 +215,8 @@ function handlePhotoSelectWithCompression(event) {
 
     // Traitement silencieux de l'image
 
-    // Utiliser le compresseur Zyma
-    window.zymaCompressor.compressImage(file, function(processedFile) {
+    // Utiliser le compresseur Pricedom
+    window.pricedomCompressor.compressImage(file, function(processedFile) {
         compressedProductPhoto = processedFile;
         
         // Mettre à jour l'input avec le fichier compressé

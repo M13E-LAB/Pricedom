@@ -3,7 +3,7 @@
 
 Bonjour,
 
-Vous recevez cet email car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Zyma.
+Vous recevez cet email car nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Pricedom.
 
 @component('mail::button', ['url' => $url])
 Réinitialiser mon mot de passe

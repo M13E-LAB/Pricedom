@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Mon Profil - Zyma')
+@section('title', 'Mon Profil - Pricedom')
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Traitement silencieux de l'avatar
 
-        // Utiliser le compresseur Zyma
-        window.zymaCompressor.compressImage(file, function(processedFile) {
+        // Utiliser le compresseur Pricedom
+        window.pricedomCompressor.compressImage(file, function(processedFile) {
             compressedAvatar = processedFile;
             
             // Mettre à jour l'input avec le fichier compressé

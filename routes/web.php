@@ -77,6 +77,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
     Route::get('/products/details/{id}', [ProductController::class, 'details'])->name('products.details');
     
+    // Routes pour le volet Prix - consultation de la base Open Prices
+    Route::get('/prices/browse', [OpenFoodFactsController::class, 'browse'])->name('prices.browse');
+    Route::get('/prices/search', [OpenFoodFactsController::class, 'searchPrices'])->name('prices.search');
+    
     Route::get('/social', [SocialController::class, 'index'])->name('social.index');
     Route::get('/social/create', [SocialController::class, 'create'])->name('social.create');
     Route::post('/social', [SocialController::class, 'store'])->name('social.store');

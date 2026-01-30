@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Zyma')</title>
+    <title>@yield('title', 'Pricedom')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,7 +13,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-16">
                 <a href="{{ route('products.search') }}" class="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                    ZYMA
+                    PRICEDOM
                 </a>
                 
                 <div class="flex items-center space-x-4">
@@ -23,6 +23,9 @@
                         </a>
                         <a href="{{ route('contribute.index') }}" class="text-white/80 hover:text-green-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
                             💸 Contribuer
+                        </a>
+                        <a href="{{ route('prices.browse') }}" class="text-white/80 hover:text-yellow-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
+                            🏷️ Prix
                         </a>
                         <a href="{{ route('prices.dashboard') }}" class="text-white/80 hover:text-blue-400 transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
                             📊 Dashboard
@@ -66,7 +69,7 @@
         @yield('content')
     </main>
 
-    <!-- Compresseur d'images Zyma -->
+    <!-- Compresseur d'images Pricedom -->
     <script src="{{ asset('js/image-compressor.js') }}"></script>
 </body>
 </html>

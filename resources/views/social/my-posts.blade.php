@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Mes Posts - Zyma')
+@section('title', 'Mes Posts - Pricedom')
 
 @section('content')
 <div class="min-h-screen">

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rejoignez la Communauté - Zyma')
+@section('title', 'Rejoignez la Communauté - Pricedom')
 
 @section('content')
 <div class="min-h-screen flex items-center">
@@ -11,7 +11,7 @@
             
             <!-- Titre principal -->
             <h1 class="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                Bienvenue dans la Communauté Zyma !
+                Bienvenue dans la Communauté Pricedom !
             </h1>
             
             <!-- Version courte du principe -->

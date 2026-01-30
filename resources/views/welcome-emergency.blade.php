@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚨 ZYMA - Mode Urgence</title>
+    <title>🚨 PRICEDOM - Mode Urgence</title>
     <style>
         body {
             background: linear-gradient(135deg, #1a1a2e, #16213e, #2d3a8c);
@@ -70,7 +70,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚨 ZYMA - MODE URGENCE</h1>
+        <h1>🚨 PRICEDOM - MODE URGENCE</h1>
         
         <div class="status">
             <h2>🔧 État du Système</h2>
@@ -107,7 +107,7 @@
 
         <div class="status">
             <h3>👤 Comptes de Test</h3>
-            <p><strong>Email :</strong> admin@zyma.com</p>
+            <p><strong>Email :</strong> admin@pricedom.com</p>
             <p><strong>Password :</strong> password123</p>
             <hr style="margin: 10px 0; opacity: 0.3;">
             <p><strong>Email :</strong> test@test.com</p>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Feed Communautaire - Zyma')
+@section('title', 'Feed Communautaire - Pricedom')
 
 @section('content')
 <div class="min-h-screen">
@@ -10,7 +10,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-white">🍽️ Feed Communautaire</h1>
-                    <p class="text-white/70 mt-1">Découvrez les délicieux repas de la communauté Zyma</p>
+                    <p class="text-white/70 mt-1">Découvrez les délicieux repas de la communauté Pricedom</p>
                 </div>
                 <a href="{{ route('social.create') }}" 
                    class="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg">
@@ -145,7 +145,7 @@
                                                     @endphp
                                                     <div class="bg-gradient-to-r {{ $scoreColor }} rounded-xl p-4 text-center">
                                                         <div class="text-white font-bold text-lg">
-                                                            💚 Score Santé Zyma : {{ $score }}/10
+                                                            💚 Score Santé Pricedom : {{ $score }}/10
                                                         </div>
                                                         <div class="flex justify-center mt-2">
                                                             @for($i = 1; $i <= 10; $i++)

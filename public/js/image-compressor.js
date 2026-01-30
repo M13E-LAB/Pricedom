@@ -1,9 +1,9 @@
 /**
- * Compresseur d'images JavaScript pour Zyma
+ * Compresseur d'images JavaScript pour Pricedom
  * Réduit automatiquement les images > 1.5MB pour respecter les limites Railway
  */
 
-class ZymaImageCompressor {
+class PricedomImageCompressor {
     constructor() {
         this.maxFileSize = 1.5 * 1024 * 1024; // 1.5MB en bytes
         this.quality = 0.8; // Qualité de compression (80%)
@@ -124,7 +124,7 @@ class ZymaImageCompressor {
 }
 
 // Instance globale
-window.zymaCompressor = new ZymaImageCompressor();
+window.pricedomCompressor = new PricedomImageCompressor();
 
 /**
  * Fonction utilitaire pour améliorer les inputs de fichier
@@ -153,7 +153,7 @@ function enhanceFileInput(inputElement) {
 
         // Afficher la prévisualisation
         previewContainer.style.display = 'block';
-        window.zymaCompressor.showPreview(file, previewContainer);
+        window.pricedomCompressor.showPreview(file, previewContainer);
 
         // Compression automatique silencieuse si nécessaire
     });

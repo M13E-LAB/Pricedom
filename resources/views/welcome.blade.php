@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenue sur Zyma - Votre communauté nutrition</title>
+    <title>Bienvenue sur Pricedom - Votre communauté nutrition</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gradient-to-br from-blue-900 via-gray-900 to-black min-h-screen text-white">
@@ -11,7 +11,7 @@
     <nav class="absolute top-0 left-0 right-0 p-6">
         <div class="container mx-auto flex justify-between items-center">
             <div class="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
-                ZYMA
+                PRICEDOM
             </div>
             <div class="space-x-4">
                 <a href="{{ route('login') }}" 

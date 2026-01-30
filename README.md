@@ -1,139 +1,276 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏷️ PRICEDOM - Smart Price Comparison Platform
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-11.9-red?style=for-the-badge&logo=laravel" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-8.2+-blue?style=for-the-badge&logo=php" alt="PHP">
+  <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind">
+  <img src="https://img.shields.io/badge/OpenAI-GPT4-412991?style=for-the-badge&logo=openai" alt="OpenAI">
 </p>
 
-# Zyma 0.5 - Social Food Platform
+**PRICEDOM** is a comprehensive Laravel-based platform that combines intelligent price comparison, social food sharing, and nutrition tracking. Built with modern web technologies and AI-powered features.
 
-Laravel-based social platform for food sharing and nutrition tracking.
+## ✨ Key Features
 
-## Quick Railway Deployment with Railpack
+### 🏷️ **Smart Price Comparison**
+- **Intelligent Search**: AI-powered product name matching with fuzzy search
+- **Real-time Data**: Access to millions of food prices worldwide
+- **Advanced Filters**: Search by price range, location, store, and date
+- **Visual Results**: Product images and detailed information display
+- **Statistics Dashboard**: Min/max/average prices, store counts, and trends
 
-### Option 1: Zero-Config Deployment (Recommended)
+### 🍽️ **Social Food Platform**
+- **Food Feed**: Share and discover food experiences
+- **AI Nutrition Analysis**: Automatic nutritional information using GPT-4 Vision
+- **Community Interaction**: Likes, comments, and reactions system
+- **User Profiles**: Customizable profiles with avatars and tags
 
-1. **Enable Railpack** in your Railway service settings
-2. **Set Environment Variables:**
+### 💸 **Price Contributions**
+- **OCR Ticket Scanning**: Upload receipts for automatic price extraction
+- **Manual Entry**: Add prices manually with validation
+- **Gamification**: Badge system for active contributors
+- **Image Compression**: Optimized image handling for uploads
+
+### 👑 **Admin Dashboard**
+- **Analytics**: Comprehensive statistics and insights
+- **User Management**: User administration and moderation
+- **Data Export**: Excel exports for all platform data
+- **Content Moderation**: Review and approve contributions
+
+## 🚀 Quick Deployment
+
+### Railway Deployment (Recommended)
+
+1. **Fork this repository**
+2. **Connect to Railway**
+3. **Set Environment Variables:**
    ```bash
-   APP_KEY=base64:bTF1YmozZmphdDQ4ejIyYTd5YXpjNWRtNzIxcDN4dW0=
+   APP_KEY=base64:your-app-key-here
    APP_ENV=production
    APP_DEBUG=false
    DB_CONNECTION=sqlite
    DB_DATABASE=/tmp/database.sqlite
+   OPENAI_API_KEY=your-openai-api-key
    ```
-3. **Deploy** - Railpack will automatically detect Laravel and configure everything!
+4. **Deploy** - Railway will automatically detect Laravel!
 
-### Option 2: Manual Dockerfile (Backup)
-
-If you prefer manual control, see `Dockerfile` in the repo.
-
-## Local Development
+### Manual Deployment
 
 ```bash
-# Clone and setup
-git clone https://github.com/M13E-LAB/Zyma0.5.git
-cd Zyma0.5
+# Clone repository
+git clone https://github.com/M13E-LAB/Pricedom.git
+cd Pricedom
+
+# Install dependencies
 composer install
 npm install
 
-# Environment
+# Environment setup
 cp .env.example .env
 php artisan key:generate
 
-# Database
+# Database setup
 touch database/database.sqlite
 php artisan migrate
 
-# Run locally
-php artisan serve & npm run dev
+# Build assets
+npm run build
+
+# Start server
+php artisan serve
 ```
 
-## Features
+## 🔧 Configuration
 
-- Social food feed
-- Nutrition analysis  
-- User profiles
-- Product search
-- Responsive design
+### Required Environment Variables
 
-## Troubleshooting Railway
+```bash
+# Application
+APP_NAME=PRICEDOM
+APP_ENV=production
+APP_KEY=base64:your-generated-key
+APP_DEBUG=false
+APP_URL=https://your-domain.com
 
-### Health Check Issues
-- Use health check path: `/up`
-- Ensure APP_KEY is set correctly
+# Database
+DB_CONNECTION=sqlite
+DB_DATABASE=/tmp/database.sqlite
 
-### Build Issues
-- Enable **Railpack** (not Nixpacks) in settings
-- Remove complex Dockerfile if using Railpack
+# OpenAI Integration
+OPENAI_API_KEY=sk-your-openai-api-key
 
-### Database Issues  
-- Use SQLite for simplicity: `DB_CONNECTION=sqlite`
-- Set `DB_DATABASE=/tmp/database.sqlite`
+# Mail Configuration (optional)
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-email
+MAIL_PASSWORD=your-password
 
-## Tech Stack
+# AWS S3/Cloudflare R2 (for image storage)
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_DEFAULT_REGION=auto
+AWS_BUCKET=your-bucket-name
+```
 
-- **Backend:** Laravel 11, PHP 8.2
-- **Frontend:** Blade, Tailwind CSS, Vite
-- **Database:** SQLite (production), MySQL (optional)
-- **Deployment:** Railway with Railpack
+## 🏗️ Architecture
 
-## About Laravel
+### Backend Stack
+- **Framework**: Laravel 11.9
+- **Language**: PHP 8.2+
+- **Database**: SQLite (production), PostgreSQL (optional)
+- **APIs**: Open Food Facts, Open Prices, OpenAI GPT-4
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Frontend Stack
+- **Templates**: Blade (Laravel's templating engine)
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **JavaScript**: Vanilla JS with modern ES6+
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### AI & External Services
+- **OCR**: Python script with GPT-4 Vision
+- **Nutrition Analysis**: OpenAI GPT-4 Vision API
+- **Price Data**: Open Prices API
+- **Product Data**: Open Food Facts API
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📱 User Interface
 
-## Learning Laravel
+### 🎨 Modern Design
+- **Responsive**: Mobile-first design with Tailwind CSS
+- **Dark Theme**: Beautiful gradient backgrounds and glassmorphism effects
+- **Intuitive Navigation**: Clear menu structure and breadcrumbs
+- **Visual Feedback**: Loading states, animations, and transitions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🔍 Smart Search
+- **Auto-complete**: Intelligent product name suggestions
+- **Visual Results**: Product images and detailed information
+- **Filter System**: Multiple filter options with real-time updates
+- **Pagination**: Efficient large dataset navigation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🧠 AI Features
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🤖 GPT-4 Vision Integration
+- **Receipt OCR**: Extract prices from receipt photos
+- **Nutrition Analysis**: Analyze food photos for nutritional content
+- **Smart Categorization**: Automatic product categorization
+- **Content Moderation**: AI-assisted content review
 
-## Laravel Sponsors
+### 🔍 Intelligent Search
+- **Fuzzy Matching**: Find products even with typos
+- **Multi-language**: Support for French and English product names
+- **Contextual Results**: Prioritize relevant results based on user location
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📊 Analytics & Insights
 
-### Premium Partners
+### 📈 Platform Metrics
+- **User Engagement**: Active users, contributions, social interactions
+- **Price Trends**: Historical price data and market insights
+- **Geographic Data**: Price variations by location and store
+- **Product Analytics**: Most searched products and categories
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 📋 Export Capabilities
+- **Excel Reports**: Comprehensive data exports
+- **API Access**: RESTful API for external integrations
+- **Real-time Data**: Live updates and notifications
 
-## Contributing
+## 🛡️ Security & Privacy
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 🔒 Security Features
+- **Authentication**: Secure login with password reset
+- **Data Validation**: Server-side validation for all inputs
+- **CSRF Protection**: Laravel's built-in CSRF protection
+- **Rate Limiting**: API rate limiting to prevent abuse
 
-## Code of Conduct
+### 🔐 Privacy
+- **Data Minimization**: Collect only necessary user data
+- **Secure Storage**: Encrypted sensitive information
+- **GDPR Compliance**: User data rights and privacy controls
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🤝 Contributing
 
-## Security Vulnerabilities
+We welcome contributions! Please follow these steps:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit changes**: `git commit -m 'Add amazing feature'`
+4. **Push to branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
 
-## License
+### Development Guidelines
+- Follow PSR-12 coding standards
+- Write tests for new features
+- Update documentation as needed
+- Use conventional commit messages
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📝 API Documentation
+
+### Price Search API
+```php
+GET /api/prices/search
+Parameters:
+- product_name: string (optional)
+- product_code: string (optional)
+- location: string (optional)
+- price_min: float (optional)
+- price_max: float (optional)
+- date_from: date (optional)
+- date_to: date (optional)
+```
+
+### Social Feed API
+```php
+GET /api/social/feed
+POST /api/social/posts
+Parameters:
+- content: string (required)
+- image: file (optional)
+- location: string (optional)
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Database Connection Error**
+```bash
+# Ensure SQLite file exists and has proper permissions
+touch database/database.sqlite
+chmod 664 database/database.sqlite
+```
+
+**OpenAI API Error**
+```bash
+# Verify your API key is set correctly
+php artisan config:clear
+php artisan cache:clear
+```
+
+**Asset Build Issues**
+```bash
+# Rebuild assets
+npm run build
+php artisan storage:link
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Laravel Team** - For the amazing framework
+- **Open Food Facts** - For the comprehensive food database
+- **Open Prices** - For the collaborative price database
+- **OpenAI** - For GPT-4 Vision API
+- **Tailwind CSS** - For the utility-first CSS framework
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/M13E-LAB/Pricedom/issues)
+- **Documentation**: [Wiki](https://github.com/M13E-LAB/Pricedom/wiki)
+- **Community**: [Discussions](https://github.com/M13E-LAB/Pricedom/discussions)
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/M13E-LAB">M13E-LAB</a>
+</p>

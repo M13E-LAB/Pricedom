@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Like;
 use App\Services\CloudflareR2Service;
+use App\Services\HealthAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -179,8 +180,28 @@ Affiche les résultats comme ceci :
                 
                 // Sauvegarder directement le contenu formaté
                 $post->nutrition_analysis = $content;
+                
+                // Analyse de santé pour la ligue
+                try {
+                    $healthService = app(HealthAnalysisService::class);
+                    $healthAnalysis = $healthService->analyzePost($request->description ?? '', $post->image_path);
+                    
+                    $post->health_score = $healthAnalysis['score'];
+                    $post->health_analysis = $healthAnalysis;
+                    
+                    \Log::info('🏆 Analyse santé calculée', [
+                        'score' => $healthAnalysis['score'],
+                        'category' => $healthAnalysis['category']
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('❌ Erreur analyse santé: ' . $e->getMessage());
+                    // Valeurs par défaut si l'analyse échoue
+                    $post->health_score = 50;
+                    $post->health_analysis = ['score' => 50, 'category' => 'Non analysé'];
+                }
+                
                 $post->save();
-                \Log::info('✅ Analyse nutritionnelle sauvegardée', ['content' => $content]);
+                \Log::info('✅ Analyse nutritionnelle et santé sauvegardées');
             } else {
                 \Log::error('❌ Structure de réponse OpenAI invalide', ['response' => $responseData]);
                 throw new \Exception('Structure de réponse OpenAI invalide');

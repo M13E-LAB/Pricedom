@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContributeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LeagueController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LikeController;
@@ -80,6 +81,64 @@ Route::middleware('auth')->group(function () {
     // Routes pour le volet Prix - consultation de la base Open Prices
     Route::get('/prices/browse', [OpenFoodFactsController::class, 'browse'])->name('prices.browse');
     Route::get('/prices/search', [OpenFoodFactsController::class, 'searchPrices'])->name('prices.search');
+    Route::get('/prices/coverage', function () {
+        return view('prices.coverage');
+    })->name('prices.coverage');
+    
+    // Route de debug pour la géolocalisation
+    Route::get('/debug/geolocation', function () {
+        return view('debug.geolocation');
+    })->name('debug.geolocation');
+    
+    // Route de debug pour tester l'API directement
+    Route::get('/debug/api-test', function (Request $request) {
+        $country = $request->get('country', 'France');
+        
+        try {
+            $response = Http::withOptions([
+                'verify' => false,
+            ])->timeout(30)->get('https://prices.openfoodfacts.org/api/v1/prices', [
+                'osm_address_country__like' => $country,
+                'size' => 10,
+                'order_by' => '-date'
+            ]);
+            
+            if ($response->successful()) {
+                $data = $response->json();
+                $items = $data['items'] ?? [];
+                
+                $output = [];
+                $output[] = "🔍 TEST API DIRECT - Pays: {$country}";
+                $output[] = "===============================================";
+                $output[] = "Total résultats: " . ($data['total'] ?? 0);
+                $output[] = "Résultats retournés: " . count($items);
+                $output[] = "";
+                
+                foreach (array_slice($items, 0, 5) as $i => $item) {
+                    $location = $item['location'] ?? [];
+                    $output[] = "#{$i} - " . ($item['product_name'] ?? 'Produit inconnu');
+                    $output[] = "  🏪 Magasin: " . ($location['osm_name'] ?? 'N/A');
+                    $output[] = "  🌍 Ville: " . ($location['osm_address_city'] ?? 'N/A');
+                    $output[] = "  🏳️ Pays: " . ($location['osm_address_country'] ?? 'N/A');
+                    $output[] = "  💰 Prix: " . ($item['price'] ?? 'N/A') . "€";
+                    $output[] = "";
+                }
+                
+                return '<pre style="background: #000; color: #0f0; padding: 20px; font-family: monospace; white-space: pre-wrap;">' . 
+                       implode("\n", $output) . 
+                       '</pre><br>' .
+                       '<a href="/debug/api-response" style="background: #ff6b35; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🔄 Autres tests</a>';
+            } else {
+                return '<h1 style="color: red;">Erreur API: ' . $response->status() . '</h1>';
+            }
+        } catch (\Exception $e) {
+            return '<h1 style="color: red;">Exception: ' . $e->getMessage() . '</h1>';
+        }
+    })->name('debug.api-test');
+    
+    Route::get('/debug/api-response', function () {
+        return view('debug.api-response');
+    })->name('debug.api-response');
     
     Route::get('/social', [SocialController::class, 'index'])->name('social.index');
     Route::get('/social/create', [SocialController::class, 'create'])->name('social.create');
@@ -95,6 +154,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/contribute/scan-ticket', [ContributeController::class, 'scanTicket'])->name('contribute.scan-ticket');
     Route::post('/contribute/store-bulk', [ContributeController::class, 'storeBulk'])->name('contribute.store-bulk');
     Route::get('/contribute/manual', [ContributeController::class, 'manual'])->name('contribute.manual');
+
+    // Routes pour la ligue healthy
+    Route::get('/league', [LeagueController::class, 'index'])->name('league.index');
+    Route::get('/league/rankings', [LeagueController::class, 'rankings'])->name('league.rankings');
 
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');

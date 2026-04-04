@@ -12,12 +12,16 @@ class Post extends Model
     protected $fillable = [
         'user_id',
         'description',
-        'image_path'
+        'image_path',
+        'health_score',
+        'health_analysis'
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'health_score' => 'integer',
+        'health_analysis' => 'array'
     ];
 
     public function user(): BelongsTo

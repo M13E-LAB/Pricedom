@@ -72,6 +72,48 @@
                                 </form>
                             @endif
                         </div>
+                        
+                        <!-- Score de santé pour la ligue -->
+                        @if(isset($post->health_score))
+                            <div class="px-4 py-2 border-b border-white/10">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        @php
+                                            $score = $post->health_score;
+                                            $category = $post->health_analysis['category'] ?? 'Non évalué';
+                                            
+                                            if ($score >= 80) {
+                                                $color = 'text-green-400';
+                                                $bgColor = 'bg-green-500/20';
+                                                $emoji = '🌟';
+                                            } elseif ($score >= 60) {
+                                                $color = 'text-blue-400';
+                                                $bgColor = 'bg-blue-500/20';
+                                                $emoji = '👍';
+                                            } elseif ($score >= 40) {
+                                                $color = 'text-yellow-400';
+                                                $bgColor = 'bg-yellow-500/20';
+                                                $emoji = '⚡';
+                                            } else {
+                                                $color = 'text-orange-400';
+                                                $bgColor = 'bg-orange-500/20';
+                                                $emoji = '🔥';
+                                            }
+                                        @endphp
+                                        
+                                        <div class="flex items-center space-x-2 {{ $bgColor }} px-3 py-1 rounded-full">
+                                            <span class="text-lg">{{ $emoji }}</span>
+                                            <span class="{{ $color }} font-semibold text-sm">{{ $score }}/100</span>
+                                            <span class="text-white/60 text-xs">{{ $category }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <a href="{{ route('league.index') }}" class="text-xs text-white/50 hover:text-white/70 transition-colors">
+                                        🏆 Voir classement
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Contenu principal du post : image + analyse -->

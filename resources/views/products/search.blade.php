@@ -1,94 +1,136 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#2d3a8c]">
-    <div class="text-center w-full">
-        <!-- Logo Section -->
-        <div class="mb-5 flex flex-col items-center justify-center">
-            <div class="flex items-center justify-center mb-4">
-                <div class="bg-white rounded-full p-2 mr-3 flex items-center justify-center" style="width: 60px; height: 60px;">
-                    <img src="https://yt3.googleusercontent.com/N6sgOb1BI-mBIuB0N2OMss9hhbI7zNVk9EKYY7QGj-2TOFFWTFpvM6uFmgj0TXsSovAXe1Vwxw=s900-c-k-c0x00ffffff-no-rj" 
-                         alt="Etchelast Logo" 
-                         style="width: 40px; height: 40px; object-fit: contain;">
-                </div>
-                <div class="text-left">
-                    <p class="mb-0 text-white/70 text-xs">Powered by</p>
-                    <h4 class="mb-0 font-bold text-white tracking-wide text-base">ETCHELAST</h4>
+<div class="min-h-screen relative overflow-hidden" style="background: var(--gradient-hero);">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-400/20 to-pink-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-pink-400/20 to-orange-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-orange-300/10 to-pink-300/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative z-10 min-h-screen flex items-center justify-center px-4">
+        <div class="text-center w-full max-w-4xl">
+            <!-- Logo Section Premium -->
+            <div class="mb-12 flex flex-col items-center justify-center animate-fade-in-up">
+                <div class="card-floating p-6 mb-8">
+                    <div class="flex items-center justify-center space-x-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-500 rounded-2xl p-3 flex items-center justify-center shadow-lg relative overflow-hidden">
+                            <img src="https://yt3.googleusercontent.com/N6sgOb1BI-mBIuB0N2OMss9hhbI7zNVk9EKYY7QGj-2TOFFWTFpvM6uFmgj0TXsSovAXe1Vwxw=s900-c-k-c0x00ffffff-no-rj" 
+                                 alt="Etchelast Logo" 
+                                 class="w-10 h-10 object-contain relative z-10">
+                            <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        </div>
+                        <div class="text-left">
+                            <div class="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-2">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-orange-500"></i>
+                                <span class="text-sm font-medium text-orange-600">Powered by</span>
+                            </div>
+                            <h4 class="text-hero font-bold tracking-wide">ETCHELAST</h4>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Title -->
-        <div class="mb-4">
-            <h1 class="font-bold mb-0 text-white" style="font-size: 4rem; line-height: 1.1; font-weight: 700;">
-                Bienvenue à<br>
-                bord<br>
-                les<br>
-                <span style="background: linear-gradient(45deg, #f97316, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Etchelastiens !</span>
-            </h1>
-        </div>
 
-        <!-- Subtitle -->
-        <div class="mb-4 mt-8">
-            <p class="mb-0 text-lg text-white/80">
-                Rejoignez la communauté nutrition qui<br>
-                révolutionne votre façon de manger sainement.
-            </p>
-        </div>
+            <!-- Hero Content -->
+            <div class="mb-12 animate-fade-in-up" style="animation-delay: 0.2s;">
+                <h1 class="text-display-1 mb-6 leading-tight">
+                    The Food Intelligence
+                    <br>
+                    <span class="text-hero">& Nutrition AI-powered platform</span>
+                </h1>
+                
+                <div class="glass-card p-6 mb-8 max-w-2xl mx-auto">
+                    <p class="text-body-lg text-neutral-700 leading-relaxed">
+                        Rejoignez la communauté nutrition qui révolutionne votre façon de manger sainement.
+                        <span class="text-body text-neutral-600 block mt-2">
+                            Découvrez, comparez et partagez vos trouvailles nutrition
+                        </span>
+                    </p>
+                </div>
+            </div>
 
-        <!-- Call to Action -->
-        <div class="mb-5 mt-10">
-            <p class="mb-0 text-base text-white/60">
-                Découvrez, comparez et partagez vos trouvailles<br>
-                nutrition
-            </p>
-        </div>
+            <!-- Stats Section Premium -->
+            <div class="mb-12 animate-fade-in-up" style="animation-delay: 0.4s;">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+                    <div class="card-stats">
+                        <div class="text-3xl font-bold text-hero mb-2">10K+</div>
+                        <div class="text-caption">Produits</div>
+                    </div>
+                    <div class="card-stats">
+                        <div class="text-3xl font-bold text-hero mb-2">50K+</div>
+                        <div class="text-caption">Prix</div>
+                    </div>
+                    <div class="card-stats">
+                        <div class="text-3xl font-bold text-hero mb-2">100+</div>
+                        <div class="text-caption">Magasins</div>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Action Buttons -->
-        @guest
-        <div class="flex flex-col md:flex-row gap-4 justify-center mt-12">
-            <a href="{{ route('contribute.index') }}" class="px-8 py-4 rounded-full font-semibold text-white text-lg shadow-xl" style="background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);">
-                💸
-            </a>
-            <a href="{{ route('login') }}" class="px-8 py-4 rounded-full font-semibold text-white text-lg shadow-xl" style="background: linear-gradient(90deg, #f97316 0%, #ec4899 100%);">
-                🍽️
-            </a>
-        </div>
-        @endguest
+            <!-- CTA Buttons Premium -->
+            @guest
+            <div class="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in-up" style="animation-delay: 0.6s;">
+                <a href="{{ route('register') }}" class="btn-primary text-lg px-10 py-4 inline-flex items-center justify-center space-x-3">
+                    <i data-lucide="rocket" class="w-5 h-5"></i>
+                    <span>Commencer l'aventure</span>
+                </a>
+                <a href="{{ route('login') }}" class="btn-secondary text-lg px-10 py-4 inline-flex items-center justify-center space-x-3">
+                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                    <span>J'ai déjà un compte</span>
+                </a>
+            </div>
+            @endguest
 
-        @auth
-        <div class="flex flex-col md:flex-row gap-4 justify-center mt-12">
-            <a href="{{ route('contribute.index') }}" class="px-8 py-4 rounded-full font-semibold text-white text-lg shadow-xl" style="background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);">
-                💸
-            </a>
-            <a href="{{ route('social.index') }}" class="px-8 py-4 rounded-full font-semibold text-white text-lg shadow-xl" style="background: linear-gradient(90deg, #f97316 0%, #ec4899 100%);">
-                🍽️
-            </a>
-        </div>
+            @auth
+            <div class="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in-up" style="animation-delay: 0.6s;">
+                <a href="{{ route('contribute.index') }}" class="btn-primary text-lg px-10 py-4 inline-flex items-center justify-center space-x-3">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    <span>Contribuer aux prix</span>
+                </a>
+                <a href="{{ route('social.index') }}" class="btn-secondary text-lg px-10 py-4 inline-flex items-center justify-center space-x-3">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Communauté</span>
+                </a>
+            </div>
+            @endauth
 
-        <!-- Quick Search Section for Authenticated Users -->
-        <div class="mt-10 pt-4" id="searchSection" style="display: none;">
-            <div class="mx-auto max-w-lg bg-black/40 rounded-2xl shadow-2xl p-6 backdrop-blur-lg border border-white/10">
-                <h5 class="text-white mb-4 font-bold text-xl">🔍 Recherche rapide de produit</h5>
-                <form action="{{ route('products.fetch') }}" method="POST">
+        <!-- Quick Search Section Amélioré pour les utilisateurs connectés -->
+        <div class="mt-12 pt-4" id="searchSection" style="display: none;">
+            <div class="mx-auto max-w-lg card animate-fade-in-up">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <i data-lucide="search" class="icon text-white"></i>
+                    </div>
+                    <h5 class="text-white font-bold text-xl">Recherche rapide</h5>
+                </div>
+                
+                <form action="{{ route('products.fetch') }}" method="POST" class="space-y-4">
                     @csrf
-                    <div class="flex mb-3">
-                        <input type="text" class="flex-1 px-4 py-3 rounded-l-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400" 
-                               id="product_code" name="product_code" required 
+                    <div class="relative">
+                        <input type="text" 
+                               class="form-input w-full pl-12" 
+                               id="product_code" 
+                               name="product_code" 
+                               required 
                                placeholder="Code-barres du produit (ex: 3017620422003)">
-                        <button type="submit" class="px-6 py-3 rounded-r-xl font-semibold text-white" style="background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);">
-                            🔍
+                        <i data-lucide="barcode" class="absolute left-4 top-1/2 transform -translate-y-1/2 icon text-white/60"></i>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="submit" class="btn-primary flex-1 flex items-center justify-center space-x-2">
+                            <i data-lucide="search" class="icon"></i>
+                            <span>Rechercher</span>
+                        </button>
+                        <button type="button" onclick="hideSearchForm()" class="btn-secondary px-4">
+                            <i data-lucide="x" class="icon"></i>
                         </button>
                     </div>
                 </form>
-                <div class="text-center mt-2">
-                    <button onclick="hideSearchForm()" class="px-6 py-2 rounded-full text-white/80 bg-white/10 border border-white/20 hover:bg-white/20 transition-all">
-                        ✕ Fermer
-                    </button>
-                </div>
             </div>
         </div>
-        @endauth
+        </div>
     </div>
 </div>
 
@@ -101,6 +143,9 @@
 @endif
 
 <script>
+// Initialize Lucide icons
+lucide.createIcons();
+
 function showSearchForm() {
     const searchSection = document.getElementById('searchSection');
     searchSection.style.display = 'block';
@@ -123,5 +168,13 @@ function hideSearchForm() {
         searchSection.style.display = 'none';
     }, 300);
 }
+
+// Animation au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    // Réinitialiser les icônes après le chargement
+    setTimeout(() => {
+        lucide.createIcons();
+    }, 100);
+});
 </script>
 @endsection

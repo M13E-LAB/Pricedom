@@ -1,0 +1,101 @@
+/* AMÉLIORATION DE LA VISIBILITÉ DU CONTENU */
+
+/* Conteneurs de contenu principal */
+.content-container {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(249, 115, 22, 0.2);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 
+    0 8px 32px rgba(249, 115, 22, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+}
+
+/* Cards avec meilleure visibilité */
+.visible-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 247, 237, 0.9));
+  border: 2px solid rgba(249, 115, 22, 0.25);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 
+    0 4px 20px rgba(249, 115, 22, 0.12),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.visible-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 30px rgba(249, 115, 22, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+/* Sections avec fond contrasté */
+.section-container {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  margin: 2rem 0;
+  border: 1px solid rgba(249, 115, 22, 0.15);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
+}
+
+/* Éléments de navigation visibles */
+.nav-item-visible {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.nav-item-visible:hover {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+/* Formulaires visibles */
+.form-visible {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(249, 115, 22, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.1);
+}
+
+/* Boutons avec meilleur contraste */
+.btn-visible {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-visible:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
+}
+
+/* Stats et métriques */
+.stats-container {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
+}
+
+/* Correction pour les éléments invisibles */
+.fix-visibility {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(249, 115, 22, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15) !important;
+}

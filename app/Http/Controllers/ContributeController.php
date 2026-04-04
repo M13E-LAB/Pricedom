@@ -7,9 +7,18 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
+use App\Models\Contribution;
+use App\Services\GamificationService;
 
 class ContributeController extends Controller
 {
+    protected $gamificationService;
+
+    public function __construct(GamificationService $gamificationService)
+    {
+        $this->gamificationService = $gamificationService;
+    }
     public function index()
     {
         // Récupérer les statistiques de l'utilisateur connecté
@@ -239,6 +248,128 @@ Instructions :
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur technique lors de l\'analyse. Réessayez dans quelques instants.'
+            ], 500);
+        }
+    }
+
+    public function storeBulk(Request $request)
+    {
+        try {
+            // Nettoyer et valider les données
+            $requestData = $request->all();
+            
+            // Nettoyer les quantités pour s'assurer qu'elles sont des entiers
+            if (isset($requestData['products']) && is_array($requestData['products'])) {
+                foreach ($requestData['products'] as $index => &$product) {
+                    // Nettoyer la quantité
+                    if (isset($product['quantity'])) {
+                        $quantity = $product['quantity'];
+                        // Si c'est une chaîne, essayer de la convertir en entier
+                        if (is_string($quantity)) {
+                            $quantity = trim($quantity);
+                            if (is_numeric($quantity)) {
+                                $product['quantity'] = (int) $quantity;
+                            } else {
+                                $product['quantity'] = 1; // Valeur par défaut
+                            }
+                        } elseif (is_numeric($quantity)) {
+                            $product['quantity'] = (int) $quantity;
+                        } else {
+                            $product['quantity'] = 1; // Valeur par défaut
+                        }
+                        
+                        // S'assurer que la quantité est au moins 1
+                        if ($product['quantity'] < 1) {
+                            $product['quantity'] = 1;
+                        }
+                    } else {
+                        $product['quantity'] = 1; // Valeur par défaut si manquante
+                    }
+                }
+            }
+            
+            // Créer une nouvelle requête avec les données nettoyées
+            $request->merge($requestData);
+            
+            $request->validate([
+                'products' => 'required|array',
+                'products.*.name' => 'required|string',
+                'products.*.price' => 'required|numeric|min:0',
+                'products.*.quantity' => 'nullable|integer|min:1',
+                'products.*.category' => 'nullable|string',
+                'store_name' => 'nullable|string',
+                'location' => 'nullable|string'
+            ]);
+
+            $user = Auth::user();
+            $contributionsCreated = 0;
+
+            \Log::info('🛒 Début enregistrement contributions en lot', [
+                'user_id' => $user->id,
+                'products_count' => count($request->products),
+                'store_name' => $request->store_name
+            ]);
+
+            foreach ($request->products as $index => $productData) {
+                try {
+                    \Log::info("📦 Traitement produit #{$index}", [
+                        'name' => $productData['name'],
+                        'price' => $productData['price'],
+                        'quantity' => $productData['quantity'] ?? 1,
+                        'category' => $productData['category'] ?? null
+                    ]);
+                    
+                    $contribution = Contribution::create([
+                        'user_id' => $user->id,
+                        'product_name' => $productData['name'],
+                        'price' => $productData['price'],
+                        'quantity' => $productData['quantity'] ?? 1,
+                        'category' => $productData['category'] ?? null,
+                        'store_name' => $request->store_name,
+                        'location' => $request->location,
+                        'contribution_type' => 'scan',
+                        'verified' => false
+                    ]);
+                    
+                    $contributionsCreated++;
+                    \Log::info("✅ Contribution #{$index} créée", ['id' => $contribution->id, 'product' => $productData['name']]);
+                    
+                } catch (\Exception $e) {
+                    \Log::error("❌ Erreur création contribution #{$index}: " . $e->getMessage(), [
+                        'product_data' => $productData,
+                        'error' => $e->getMessage()
+                    ]);
+                    throw $e;
+                }
+            }
+
+            // Attribuer les badges pour toutes les contributions
+            $newBadges = $this->gamificationService->checkAndAwardBadges($user);
+
+            \Log::info("✅ {$contributionsCreated} contributions créées depuis le ticket");
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$contributionsCreated} produits ajoutés avec succès !",
+                'contributions_count' => $contributionsCreated,
+                'new_badges' => $newBadges
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('❌ Erreur validation storeBulk: ', $e->errors());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation: ' . implode(', ', Arr::flatten($e->errors()))
+            ], 422);
+            
+        } catch (\Exception $e) {
+            \Log::error('❌ Erreur storeBulk: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage()
             ], 500);
         }
     }

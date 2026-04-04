@@ -1,7 +1,6 @@
 @import 'design-system.css';
 @import 'mobile-improvements.css';
 @import 'content-visibility.css';
-@import 'visibility-fix.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,0 +1,239 @@
+/* MOBILE-FIRST IMPROVEMENTS */
+
+/* === RESPONSIVE NAVIGATION === */
+.mobile-nav {
+  display: none;
+}
+
+/* Menu mobile caché par défaut */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  z-index: 9999;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  visibility: hidden;
+}
+
+.mobile-menu.active {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+  
+  .mobile-nav {
+    display: block;
+  }
+  
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(20px);
+    z-index: 9999;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    visibility: hidden;
+  }
+  
+  .mobile-menu.active {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  
+  .mobile-menu-content {
+    padding: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    background: rgba(249, 115, 22, 0.1);
+    color: #374151;
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 500;
+    width: 100%;
+    max-width: 300px;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    cursor: pointer;
+  }
+  
+  .mobile-nav-link:hover {
+    background: rgba(249, 115, 22, 0.2);
+    color: #ea580c;
+    transform: translateY(-2px);
+  }
+}
+
+/* === TOUCH-FRIENDLY INTERACTIONS === */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === MOBILE CARDS === */
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* === MOBILE FORMS === */
+@media (max-width: 768px) {
+  .form-input {
+    padding: 1rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* === MOBILE SEARCH === */
+.mobile-search {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  z-index: 50;
+}
+
+.search-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-xl);
+  z-index: 60;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-fab:hover {
+  transform: scale(1.1);
+}
+
+/* === MOBILE TYPOGRAPHY === */
+@media (max-width: 768px) {
+  .text-display-1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+  
+  .text-display-2 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .text-heading-1 {
+    font-size: 1.75rem;
+  }
+  
+  .text-heading-2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* === MOBILE ANIMATIONS === */
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* === MOBILE SAFE AREAS === */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-area-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* === MOBILE PERFORMANCE === */
+.mobile-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce animations on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

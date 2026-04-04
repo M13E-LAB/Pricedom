@@ -63,6 +63,33 @@
         @endif
     </div>
 
+    <!-- Avertissement géolocalisation -->
+    @if(isset($locationWarning))
+    <div class="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
+        <div class="flex items-start space-x-3">
+            <div class="text-yellow-400 text-xl">⚠️</div>
+            <div>
+                <h3 class="text-yellow-300 font-bold mb-2">Localisation non trouvée</h3>
+                <p class="text-yellow-100 mb-3">{{ $locationWarning['message'] }}</p>
+                <div class="text-yellow-200 text-sm">
+                    <p><strong>💡 Suggestions :</strong></p>
+                    <ul class="list-disc list-inside ml-4 mt-1">
+                        <li>Essayez avec "{{ ucfirst($locationWarning['found'][0] ?? 'Grenoble') }}" (données disponibles)</li>
+                        <li>Recherchez par pays uniquement (🇫🇷 France)</li>
+                        <li>Utilisez le nom d'un magasin spécifique</li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ route('prices.search', ['location_osm_address_city' => $locationWarning['found'][0] ?? 'Grenoble']) }}" 
+                       class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                        🔍 Rechercher à {{ ucfirst($locationWarning['found'][0] ?? 'Grenoble') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Filtres actifs -->
     @if(count(array_filter($filters)) > 0)
     <div class="bg-white/5 backdrop-blur-lg rounded-lg p-4 mb-6 border border-white/10">
@@ -70,10 +97,22 @@
             <span class="text-white/80 font-semibold">🏷️ Filtres actifs:</span>
             
             @foreach($filters as $key => $value)
-                @if($value)
+                    @if($value)
                     @if($key === 'product_name')
                         <span class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm border border-green-500/30">
                             ⚡ Recherche intelligente: {{ $value }}
+                        </span>
+                    @elseif($key === 'location_osm_address_city')
+                        <span class="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-500/30">
+                            🌍 Ville: {{ $value }}
+                        </span>
+                    @elseif($key === 'location_osm_address_country')
+                        <span class="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm border border-purple-500/30">
+                            🏳️ Pays: {{ $value }}
+                        </span>
+                    @elseif($key === 'location_osm_name')
+                        <span class="bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full text-sm border border-orange-500/30">
+                            🏪 Magasin: {{ $value }}
                         </span>
                     @else
                         <span class="bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full text-sm border border-yellow-500/30">

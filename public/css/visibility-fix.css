@@ -1,0 +1,97 @@
+/* CORRECTION URGENTE - VISIBILITÉ SUR FOND BLANC */
+
+/* Force tous les textes à être visibles */
+.text-gray-600, .text-gray-700, .text-white\/60, .text-white\/70, .text-white\/80 {
+    color: #1f2937 !important; /* Gris très foncé */
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Force les icônes à être visibles */
+.icon, i[data-lucide] {
+    color: #374151 !important; /* Gris foncé */
+    stroke: #374151 !important;
+}
+
+/* Force les éléments avec text-white à être sombres */
+.text-white {
+    color: #111827 !important; /* Noir */
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Améliore la visibilité des cartes */
+.card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid #f97316 !important; /* Orange */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Force la visibilité des barres de progression */
+.bg-white\/10, [class*="bg-white/"] {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 2px solid #f97316 !important;
+}
+
+/* Améliore les gradients pour qu'ils soient visibles */
+.bg-gradient-to-r {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force la navigation à être visible */
+.nav-link {
+    color: #374151 !important;
+    font-weight: 600 !important;
+}
+
+.nav-link:hover {
+    color: #f97316 !important;
+    background: rgba(249, 115, 22, 0.1) !important;
+}
+
+/* Force les boutons à être visibles */
+button, .btn-primary, .btn-secondary {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Améliore le contraste général */
+body {
+    background: linear-gradient(135deg, #fef7f0 0%, #fff7ed 50%, #fed7aa 100%) !important;
+}
+
+/* Force tous les éléments invisibles à être visibles */
+* {
+    text-shadow: none !important;
+}
+
+/* Spécifique aux éléments de stats */
+.text-2xl.font-bold {
+    color: #f97316 !important; /* Orange vif */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Force les placeholder et labels */
+::placeholder {
+    color: #6b7280 !important;
+}
+
+/* Améliore les inputs */
+input, textarea, select {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 2px solid #d1d5db !important;
+    color: #111827 !important;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #f97316 !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2) !important;
+}
+
+/* Force la visibilité des éléments de dashboard */
+.space-y-4 > div, .space-y-6 > div {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin: 8px 0 !important;
+}

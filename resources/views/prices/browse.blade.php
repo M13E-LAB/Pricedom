@@ -78,6 +78,26 @@
                     >
                 </div>
 
+                <!-- Pays -->
+                <div>
+                    <label class="block text-white font-semibold mb-2">
+                        🏳️ Pays
+                    </label>
+                    <select 
+                        name="location_osm_address_country" 
+                        class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                    >
+                        <option value="">Tous les pays</option>
+                        <option value="France" {{ request('location_osm_address_country') === 'France' ? 'selected' : '' }}>🇫🇷 France</option>
+                        <option value="Germany" {{ request('location_osm_address_country') === 'Germany' ? 'selected' : '' }}>🇩🇪 Allemagne</option>
+                        <option value="Spain" {{ request('location_osm_address_country') === 'Spain' ? 'selected' : '' }}>🇪🇸 Espagne</option>
+                        <option value="Italy" {{ request('location_osm_address_country') === 'Italy' ? 'selected' : '' }}>🇮🇹 Italie</option>
+                        <option value="Belgium" {{ request('location_osm_address_country') === 'Belgium' ? 'selected' : '' }}>🇧🇪 Belgique</option>
+                        <option value="Switzerland" {{ request('location_osm_address_country') === 'Switzerland' ? 'selected' : '' }}>🇨🇭 Suisse</option>
+                        <option value="Austria" {{ request('location_osm_address_country') === 'Austria' ? 'selected' : '' }}>🇦🇹 Autriche</option>
+                    </select>
+                </div>
+
                 <!-- Prix minimum -->
                 <div>
                     <label class="block text-white font-semibold mb-2">
@@ -150,6 +170,13 @@
                     class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-8 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg text-center"
                 >
                     🔄 Réinitialiser
+                </a>
+                
+                <a 
+                    href="{{ route('prices.coverage') }}" 
+                    class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg text-center"
+                >
+                    🌍 Couverture géographique
                 </a>
             </div>
         </form>

@@ -143,11 +143,27 @@ class OpenFoodFactsController extends Controller
             }
             
             if ($request->filled('location_osm_name')) {
-                $params['location_osm_name__icontains'] = $request->location_osm_name;
+                $params['osm_name__like'] = $request->location_osm_name;
             }
             
             if ($request->filled('location_osm_address_city')) {
-                $params['location_osm_address_city__icontains'] = $request->location_osm_address_city;
+                $citySearch = $request->location_osm_address_city;
+                
+                // Amélioration géolocalisation : recherche plus précise pour les villes françaises
+                $frenchCities = ['paris', 'lyon', 'marseille', 'toulouse', 'nice', 'nantes', 'montpellier', 'strasbourg', 'bordeaux', 'lille'];
+                
+                if (in_array(strtolower($citySearch), $frenchCities)) {
+                    // Pour les villes françaises, forcer la recherche en France
+                    $params['osm_address_city__like'] = $citySearch;
+                    $params['osm_address_country__like'] = 'France';
+                } else {
+                    $params['osm_address_city__like'] = $citySearch;
+                }
+            }
+            
+            // Filtre par pays explicite
+            if ($request->filled('location_osm_address_country')) {
+                $params['osm_address_country__like'] = $request->location_osm_address_country;
             }
             
             if ($request->filled('price_min')) {
@@ -173,6 +189,13 @@ class OpenFoodFactsController extends Controller
             // Tri par date décroissante
             $params['order_by'] = '-date';
 
+            // Debug: Log des paramètres de recherche
+            \Log::info('Recherche de prix avec paramètres:', [
+                'params' => $params,
+                'url' => $this->priceApiUrl,
+                'user_filters' => $request->all()
+            ]);
+
             // Appel à l'API Open Prices
             $response = Http::withOptions([
                 'verify' => false,
@@ -181,8 +204,60 @@ class OpenFoodFactsController extends Controller
             if ($response->successful()) {
                 $data = $response->json();
                 
+                // Debug: Log de la réponse brute
+                \Log::info('Réponse API brute:', [
+                    'total' => $data['total'] ?? 0,
+                    'items_count' => count($data['items'] ?? []),
+                    'first_3_countries' => collect($data['items'] ?? [])->take(3)->map(function($item) {
+                        return $item['location']['osm_address_country'] ?? 'N/A';
+                    })->toArray()
+                ]);
+                
                 $prices = $this->processAdvancedPrices($data['items'] ?? []);
+                
+                // FILTRAGE CÔTÉ APPLICATION pour corriger les bugs de l'API
+                if ($request->filled('location_osm_address_country')) {
+                    $requestedCountry = strtolower($request->location_osm_address_country);
+                    $prices = array_filter($prices, function($price) use ($requestedCountry) {
+                        $priceCountry = strtolower($price['location']['osm_address_country'] ?? '');
+                        return strpos($priceCountry, $requestedCountry) !== false;
+                    });
+                    $prices = array_values($prices); // Réindexer le tableau
+                }
+                
+                if ($request->filled('location_osm_address_city')) {
+                    $requestedCity = strtolower($request->location_osm_address_city);
+                    $prices = array_filter($prices, function($price) use ($requestedCity) {
+                        $priceCity = strtolower($price['location']['osm_address_city'] ?? '');
+                        return strpos($priceCity, $requestedCity) !== false;
+                    });
+                    $prices = array_values($prices); // Réindexer le tableau
+                }
+                
                 $stats = $this->calculateAdvancedStats($prices);
+                
+                // Vérification de la cohérence géographique
+                $locationWarning = null;
+                if ($request->filled('location_osm_address_city')) {
+                    $searchedCity = strtolower($request->location_osm_address_city);
+                    $actualCities = [];
+                    
+                    foreach ($prices as $price) {
+                        $actualCity = strtolower($price['location']['osm_address_city'] ?? '');
+                        if (!empty($actualCity) && !in_array($actualCity, $actualCities)) {
+                            $actualCities[] = $actualCity;
+                        }
+                    }
+                    
+                    // Si aucune ville ne correspond à la recherche
+                    if (!empty($actualCities) && !in_array($searchedCity, $actualCities)) {
+                        $locationWarning = [
+                            'searched' => $request->location_osm_address_city,
+                            'found' => $actualCities,
+                            'message' => "Aucun prix trouvé pour {$request->location_osm_address_city}. Les résultats proviennent de : " . implode(', ', array_map('ucfirst', $actualCities))
+                        ];
+                    }
+                }
                 
                 return view('prices.search-results', [
                     'prices' => $prices,
@@ -191,7 +266,8 @@ class OpenFoodFactsController extends Controller
                     'page' => $data['page'] ?? 1,
                     'pages' => $data['pages'] ?? 1,
                     'size' => $data['size'] ?? 20,
-                    'filters' => $request->all()
+                    'filters' => $request->all(),
+                    'locationWarning' => $locationWarning
                 ]);
             } else {
                 return back()->with('error', 'Erreur lors de la recherche dans la base de données');
@@ -453,11 +529,26 @@ class OpenFoodFactsController extends Controller
                 
                 // Ajouter les autres filtres
                 if ($request->filled('location_osm_name')) {
-                    $params['location_osm_name__icontains'] = $request->location_osm_name;
+                    $params['osm_name__like'] = $request->location_osm_name;
                 }
                 
                 if ($request->filled('location_osm_address_city')) {
-                    $params['location_osm_address_city__icontains'] = $request->location_osm_address_city;
+                    $citySearch = $request->location_osm_address_city;
+                    
+                    // Amélioration géolocalisation pour recherche par codes-barres
+                    $frenchCities = ['paris', 'lyon', 'marseille', 'toulouse', 'nice', 'nantes', 'montpellier', 'strasbourg', 'bordeaux', 'lille'];
+                    
+                    if (in_array(strtolower($citySearch), $frenchCities)) {
+                        $params['osm_address_city__like'] = $citySearch;
+                        $params['osm_address_country__like'] = 'France';
+                    } else {
+                        $params['osm_address_city__like'] = $citySearch;
+                    }
+                }
+                
+                // Filtre par pays explicite pour recherche par codes-barres
+                if ($request->filled('location_osm_address_country')) {
+                    $params['osm_address_country__like'] = $request->location_osm_address_country;
                 }
                 
                 if ($request->filled('price_min')) {

@@ -1,1 +1,1 @@
-web: chmod +x emergency-start.sh && ./emergency-start.sh vendor/bin/heroku-php-apache2 -p $PORT public/ 
+web: chmod +x railway-start.sh && ./railway-start.sh 

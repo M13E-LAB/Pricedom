@@ -1,0 +1,29 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[[services]]
+name = "pricedom"
+
+[services.variables]
+APP_ENV = "production"
+APP_DEBUG = "false"
+APP_KEY = { $generate = true }
+LOG_CHANNEL = "stderr"
+DB_CONNECTION = "sqlite"
+DB_DATABASE = "/tmp/database.sqlite"
+SESSION_DRIVER = "file"
+CACHE_DRIVER = "file"
+QUEUE_CONNECTION = "sync"
+
+[services.build]
+watchPatterns = [
+    "**/*.php", 
+    "**/*.blade.php",
+    "composer.json",
+    "package.json"
+]

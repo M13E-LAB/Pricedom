@@ -12,13 +12,13 @@ name = "pricedom"
 [services.variables]
 APP_ENV = "production"
 APP_DEBUG = "false"
-APP_KEY = { $generate = true }
 LOG_CHANNEL = "stderr"
-DB_CONNECTION = "sqlite"
-DB_DATABASE = "/tmp/database.sqlite"
-SESSION_DRIVER = "file"
+DB_CONNECTION = "pgsql"
+SESSION_DRIVER = "database"
 CACHE_DRIVER = "file"
 QUEUE_CONNECTION = "sync"
+PHP_MEMORY_LIMIT = "512M"
+PHP_MAX_EXECUTION_TIME = "600"
 
 [services.build]
 watchPatterns = [

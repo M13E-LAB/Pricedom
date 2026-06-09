@@ -1,34 +1,45 @@
 #!/bin/bash
-set -e
 
 echo "🚀 Starting Pricedom deployment..."
 
-# Wait for PostgreSQL to be ready
-echo "⏳ Waiting for PostgreSQL connection..."
-timeout 30 bash -c 'until php artisan db:show 2>/dev/null; do sleep 1; done' || echo "⚠️ Database connection timeout, continuing..."
+# Set error handling but don't exit on first error
+set +e
 
-# Clear all caches
+# Check if PORT is set
+if [ -z "$PORT" ]; then
+    export PORT=8080
+    echo "⚠️ PORT not set, defaulting to 8080"
+fi
+
+echo "🌐 Using port: $PORT"
+
+# Basic Laravel setup
 echo "🧹 Clearing caches..."
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
-php artisan view:clear
+php artisan config:clear || echo "Config clear failed, continuing..."
+php artisan cache:clear || echo "Cache clear failed, continuing..."
+php artisan route:clear || echo "Route clear failed, continuing..."
+php artisan view:clear || echo "View clear failed, continuing..."
 
-# Run migrations
-echo "🗄️ Running database migrations..."
-php artisan migrate --force
+# Test database connection
+echo "🗄️ Testing database connection..."
+if php artisan db:show 2>/dev/null; then
+    echo "✅ Database connected successfully"
+    # Run migrations only if DB is connected
+    php artisan migrate --force || echo "⚠️ Migration failed, continuing..."
+else
+    echo "❌ Database connection failed, skipping migrations"
+fi
 
 # Link storage (if needed)
 echo "🔗 Linking storage..."
-php artisan storage:link || true
+php artisan storage:link 2>/dev/null || echo "Storage link failed or already exists"
 
-# Optimize for production
-echo "⚡ Optimizing for production..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Simple production optimization
+echo "⚡ Basic optimization..."
+php artisan config:cache 2>/dev/null || echo "Config cache failed"
 
 echo "✅ Pricedom setup complete!"
 
-# Start the server
-exec php artisan serve --host=0.0.0.0 --port=$PORT
+# Start the server with verbose output
+echo "🚀 Starting server on 0.0.0.0:$PORT"
+exec php artisan serve --host=0.0.0.0 --port=$PORT --verbose

@@ -271,3 +271,4 @@ php artisan storage:link
 <p align="center">
   Made with ❤️ by <a href="https://github.com/M13E-LAB">M13E-LAB</a>
 </p># Force Railway redeploy
+# Force new Railway deployment

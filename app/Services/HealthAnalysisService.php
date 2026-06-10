@@ -7,35 +7,29 @@ use Illuminate\Support\Facades\Log;
 
 class HealthAnalysisService
 {
+    protected $claudeService;
+
+    public function __construct()
+    {
+        $this->claudeService = new ClaudeService();
+    }
+
     public function analyzePost($description, $imagePath = null)
     {
         try {
-            // Analyse basée sur le texte de description
-            $textScore = $this->analyzeDescription($description);
+            // Utilise Claude pour l'analyse
+            $claudeAnalysis = $this->claudeService->analyzeFood($description, $imagePath);
             
-            // Si on a une image, analyse avec OpenAI Vision
-            $imageScore = 0;
-            $imageAnalysis = null;
-            
-            if ($imagePath && config('services.openai.api_key')) {
-                $imageAnalysis = $this->analyzeImageWithAI($imagePath, $description);
-                $imageScore = $imageAnalysis['score'] ?? 0;
-            }
-            
-            // Score final (moyenne pondérée)
-            $finalScore = $imagePath ? 
-                round(($textScore * 0.3) + ($imageScore * 0.7)) : 
-                $textScore;
+            $finalScore = $claudeAnalysis['score'];
             
             // Catégorisation
             $category = $this->getHealthCategory($finalScore);
             
             return [
                 'score' => max(0, min(100, $finalScore)),
-                'category' => $category,
-                'text_analysis' => $this->getTextAnalysisDetails($description),
-                'image_analysis' => $imageAnalysis,
-                'recommendations' => $this->getRecommendations($finalScore, $description)
+                'category' => $claudeAnalysis['category'],
+                'recommendations' => $claudeAnalysis['recommendations'],
+                'claude_powered' => true
             ];
             
         } catch (\Exception $e) {

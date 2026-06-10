@@ -39,4 +39,9 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'claude' => [
+        'api_key' => env('CLAUDE_API_KEY'),
+        'model' => env('CLAUDE_MODEL', 'claude-3-5-sonnet-20241022'),
+    ],
+
 ];

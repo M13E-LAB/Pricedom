@@ -104,7 +104,7 @@ class ContributeController extends Controller
             }
             
             // Uploader sur R2
-            $imageUrl = $r2Service->uploadFile($file, 'tickets');
+            $imageUrl = $r2Service->uploadImage($file, 'tickets');
             Log::info('📷 Image uploadée sur R2', ['url' => $imageUrl]);
             
             // Analyser avec Claude

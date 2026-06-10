@@ -23,6 +23,18 @@ class ClaudeService
     public function analyzeFood($description, $imagePath = null)
     {
         try {
+            Log::info('🤖 Claude API call starting', [
+                'description' => $description,
+                'has_image' => !is_null($imagePath),
+                'api_key_set' => !empty($this->apiKey),
+                'model' => $this->model
+            ]);
+
+            if (empty($this->apiKey)) {
+                Log::error('❌ Claude API key not configured');
+                return $this->getDefaultAnalysis();
+            }
+
             $messages = [
                 [
                     'role' => 'user',
@@ -40,16 +52,29 @@ class ClaudeService
                 'messages' => $messages
             ]);
 
+            Log::info('🤖 Claude API response', [
+                'status' => $response->status(),
+                'successful' => $response->successful()
+            ]);
+
             if ($response->successful()) {
                 $data = $response->json();
+                Log::info('✅ Claude API success', ['response_keys' => array_keys($data)]);
                 return $this->parseFoodAnalysis($data['content'][0]['text']);
             }
 
-            Log::error('Claude API Error', ['response' => $response->body()]);
+            Log::error('❌ Claude API Error', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
             return $this->getDefaultAnalysis();
 
         } catch (\Exception $e) {
-            Log::error('Claude Service Error', ['error' => $e->getMessage()]);
+            Log::error('❌ Claude Service Error', [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
             return $this->getDefaultAnalysis();
         }
     }

@@ -169,19 +169,23 @@
                                         @endphp
                                         
                                         @foreach($lines as $line)
-                                            @php $line = trim($line); @endphp
+                                            @php 
+                                                $line = trim($line);
+                                                // Nettoyer les ** et autres formats markdown
+                                                $line = preg_replace('/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $line);
+                                            @endphp
                                             @if(!empty($line))
-                                                @if(str_contains($line, '🍽️ Repas identifié'))
+                                                @if(str_contains($line, '🍽️ Repas identifié') || str_contains($line, 'Repas identifié'))
                                                     <div class="text-center mb-4">
                                                         <h3 class="text-lg font-bold text-white bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                                                            {{ str_replace('**🍽️ Repas identifié** :', '🍽️', $line) }}
+                                                            {!! strip_tags($line, '<strong>') !!}
                                                         </h3>
                                                     </div>
-                                                @elseif(str_contains($line, '🔥') || str_contains($line, '🥖') || str_contains($line, '🍗') || str_contains($line, '🥑'))
+                                                @elseif(str_contains($line, '🔥') || str_contains($line, '🥖') || str_contains($line, '🍗') || str_contains($line, '🥑') || str_contains($line, 'Calories') || str_contains($line, 'Glucides') || str_contains($line, 'Protéines') || str_contains($line, 'Lipides'))
                                                     <div class="flex items-center justify-between bg-white/5 rounded-lg px-4 py-2 border border-white/10">
-                                                        <span class="text-white/90 font-medium">{{ $line }}</span>
+                                                        <span class="text-white/90 font-medium">{!! strip_tags($line, '<strong>') !!}</span>
                                                     </div>
-                                                @elseif(str_contains($line, '💚 Score Santé'))
+                                                @elseif(str_contains($line, '💚 Score Santé') || str_contains($line, 'Score Santé'))
                                                     @php
                                                         preg_match('/(\d+)\/10/', $line, $matches);
                                                         $score = $matches[1] ?? 0;
@@ -197,21 +201,21 @@
                                                             @endfor
                                                         </div>
                                                     </div>
-                                                @elseif(str_contains($line, '✍️ **Feedback**'))
-                                                    <div class="border-t border-white/20 pt-4">
+                                                @elseif(str_contains($line, '✍️') || str_contains($line, 'Feedback') || str_contains($line, 'Conseils'))
+                                                    <div class="border-t border-white/20 pt-4 mt-3">
                                                         <h4 class="text-emerald-300 font-semibold mb-2 flex items-center">
                                                             <span class="mr-2">💬</span> Conseils personnalisés
                                                         </h4>
                                                     </div>
-                                                @elseif($currentSection === 'feedback' || str_contains($line, 'Repas') || str_contains($line, 'Ajouter') || str_contains($line, 'Pensez'))
+                                                @elseif($currentSection === 'feedback' || preg_match('/(plat|repas|légumes|fruits|protéines|glucides|lipides|calories|nutrition|santé|éviter|privilégier|ajouter|pensez|conseil)/i', $line))
                                                     @php $currentSection = 'feedback'; @endphp
-                                                    @if(!str_contains($line, '✍️'))
-                                                        <p class="text-white/80 italic leading-relaxed bg-white/5 rounded-lg p-3 border-l-4 border-emerald-400">
-                                                            {{ $line }}
+                                                    @if(!str_contains($line, '✍️') && !str_contains($line, 'Feedback'))
+                                                        <p class="text-white/80 leading-relaxed bg-white/5 rounded-lg p-3 border-l-4 border-emerald-400">
+                                                            {!! strip_tags($line, '<strong>') !!}
                                                         </p>
                                                     @endif
                                                 @elseif(!str_contains($line, '---') && !empty($line))
-                                                    <div class="text-white/70 text-sm">{{ $line }}</div>
+                                                    <div class="text-white/70 text-sm">{!! strip_tags($line, '<strong>') !!}</div>
                                                 @endif
                                             @endif
                                         @endforeach

@@ -95,3 +95,18 @@ input:focus, textarea:focus, select:focus {
     padding: 16px !important;
     margin: 8px 0 !important;
 }
+
+/* CACHE LE MENU MOBILE PAR DÉFAUT */
+#mobileMenu:not(.active) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateX(-100%) !important;
+}
+
+#mobileMenu.active {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateX(0) !important;
+}

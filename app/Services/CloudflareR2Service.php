@@ -58,15 +58,15 @@ class CloudflareR2Service
         try {
             $url = $this->disk->url($path);
             // Si l'URL contient r2.cloudflarestorage.com, on doit la remplacer par une URL publique
-            // Pour l'instant, on va créer une route proxy locale
+            // Utiliser la route proxy locale
             if (strpos($url, 'r2.cloudflarestorage.com') !== false) {
                 // Retourner une URL qui passera par un proxy local
-                return env('APP_URL', 'http://localhost') . '/r2-proxy/' . urlencode($path);
+                return env('APP_URL', 'http://localhost') . '/r2-image/' . urlencode($path);
             }
             return $url;
         } catch (Exception $e) {
             // Si tout échoue, retourner URL proxy
-            return env('APP_URL', 'http://localhost') . '/r2-proxy/' . urlencode($path);
+            return env('APP_URL', 'http://localhost') . '/r2-image/' . urlencode($path);
         }
     }
 

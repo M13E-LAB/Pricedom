@@ -303,16 +303,16 @@ Instructions :
             $prompt = "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n";
         }
         
-        $prompt .= "Donne une analyse complète au format suivant :\n\n";
-        $prompt .= "---\n\n";
-        $prompt .= "**🍽️ Repas identifié** : [nom du plat]\n\n";
-        $prompt .= "**🔥 Calories** : [estimation] kcal\n\n";
-        $prompt .= "**🥖 Glucides** : [estimation] g\n\n";
-        $prompt .= "**🍗 Protéines** : [estimation] g\n\n";
-        $prompt .= "**🥑 Lipides** : [estimation] g\n\n";
-        $prompt .= "**💚 Score Santé** : [score]/10\n\n";
+        $prompt .= "Réponds EXACTEMENT dans ce format texte (PAS de markdown ##, seulement ce format) :\n\n";
+        $prompt .= "**🍽️ Repas identifié** : [nom exact du plat]\n\n";
+        $prompt .= "**🔥 Calories** : [nombre] kcal\n\n";
+        $prompt .= "**🥖 Glucides** : [nombre] g\n\n";
+        $prompt .= "**🍗 Protéines** : [nombre] g\n\n";
+        $prompt .= "**🥑 Lipides** : [nombre] g\n\n";
+        $prompt .= "**💚 Score Santé** : [score de 0 à 10]/10\n\n";
         $prompt .= "✍️ **Feedback** :\n\n";
-        $prompt .= "[Ton analyse personnalisée du repas avec conseils]";
+        $prompt .= "[Ton analyse en 2-3 phrases courtes avec conseils pratiques]\n\n";
+        $prompt .= "IMPORTANT : Utilise ce format exact, pas de titres ##, pas de listes à puces, juste le format ci-dessus.";
 
         return $prompt;
     }
@@ -330,14 +330,16 @@ Instructions :
             $prompt = "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n";
         }
         
-        $prompt .= "Donne une analyse complète au format texte lisible avec :\n\n" .
-                   "**🍽️ Repas identifié** : [nom du plat]\n\n" .
-                   "**🔥 Calories** : [estimation] kcal\n" .
-                   "**🥖 Glucides** : [estimation] g\n" .
-                   "**🍗 Protéines** : [estimation] g\n" .
-                   "**🥑 Lipides** : [estimation] g\n\n" .
-                   "**💚 Score Santé** : [score]/10\n\n" .
-                   "✍️ **Feedback** : [Ton analyse personnalisée avec conseils]";
+        $prompt .= "Réponds EXACTEMENT dans ce format texte (PAS de markdown ##, seulement ce format) :\n\n" .
+                   "**🍽️ Repas identifié** : [nom exact du plat]\n\n" .
+                   "**🔥 Calories** : [nombre] kcal\n\n" .
+                   "**🥖 Glucides** : [nombre] g\n\n" .
+                   "**🍗 Protéines** : [nombre] g\n\n" .
+                   "**🥑 Lipides** : [nombre] g\n\n" .
+                   "**💚 Score Santé** : [score de 0 à 10]/10\n\n" .
+                   "✍️ **Feedback** :\n\n" .
+                   "[Ton analyse en 2-3 phrases courtes avec conseils pratiques]\n\n" .
+                   "IMPORTANT : Utilise ce format exact, pas de titres ##, pas de listes à puces, juste le format ci-dessus.";
         
         return $prompt;
     }
@@ -424,12 +426,12 @@ Instructions :
             // Si c'est une URL complète, extraire le path R2
             if (strpos($imagePath, 'http') === 0) {
                 // Extraire le path depuis l'URL
-                // Format: https://domain.com/r2-proxy/posts/filename.jpg
+                // Format: https://domain.com/r2-image/posts/filename.jpg
                 // ou: https://bucket.r2.cloudflarestorage.com/posts/filename.jpg
                 
-                if (strpos($imagePath, '/r2-proxy/') !== false) {
+                if (strpos($imagePath, '/r2-image/') !== false) {
                     // URL proxy locale
-                    $path = substr($imagePath, strpos($imagePath, '/r2-proxy/') + 10);
+                    $path = substr($imagePath, strpos($imagePath, '/r2-image/') + 10);
                     $path = urldecode($path);
                 } elseif (strpos($imagePath, 'r2.cloudflarestorage.com') !== false) {
                     // URL R2 directe - extraire le path après le bucket

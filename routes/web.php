@@ -680,24 +680,21 @@ Route::get('/debug-nutrition/{postId?}', function ($postId = null) {
            '<a href="/social" style="background: #32cd32; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🍽️ Retour Feed</a>';
 });
 
-// Route proxy pour servir les images R2 qui ne sont pas publiquement accessibles
+// Route proxy pour servir les images R2 publiquement
 Route::get('/r2-image/{path}', function ($path) {
     try {
-        $r2Service = new \App\Services\CloudflareR2Service();
+        $path = urldecode($path);
         
-        // Décoder le chemin qui pourrait être encodé
-        $decodedPath = urldecode($path);
+        // Récupérer le contenu depuis R2
+        $content = Storage::disk('r2')->get($path);
         
-        // Vérifier si le fichier existe
-        if (!$r2Service->exists($decodedPath)) {
+        if (!$content) {
+            \Log::error('R2 Image not found', ['path' => $path]);
             abort(404, 'Image not found');
         }
         
-        // Obtenir le contenu de l'image
-        $imageContent = $r2Service->getContent($decodedPath);
-        
-        // Déterminer le type MIME basé sur l'extension
-        $extension = strtolower(pathinfo($decodedPath, PATHINFO_EXTENSION));
+        // Déterminer le type MIME
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
         $mimeTypes = [
             'jpg' => 'image/jpeg',
             'jpeg' => 'image/jpeg',
@@ -705,8 +702,7 @@ Route::get('/r2-image/{path}', function ($path) {
             'gif' => 'image/gif',
             'webp' => 'image/webp',
         ];
-        
-        $mimeType = $mimeTypes[$extension] ?? 'image/jpeg';
+        $mimeType = $mimeTypes[strtolower($extension)] ?? 'image/jpeg';
         
         return response($imageContent)
             ->header('Content-Type', $mimeType)
@@ -874,33 +870,3 @@ Route::get('/fix-openai-api', function () {
            '<a href="/social" style="background: #ff6b35; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🍽️ Voir le Feed</a> ' .
            '<a href="/fix-openai-api" style="background: #32cd32; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🔄 Re-essayer</a>';
 });
-
-// Route proxy pour servir les images R2 publiquement
-Route::get('/r2-proxy/{path}', function ($path) {
-    try {
-        $path = urldecode($path);
-        $r2Service = app(\App\Services\CloudflareR2Service::class);
-        
-        // Récupérer le contenu depuis R2
-        $content = Storage::disk('r2')->get($path);
-        
-        // Déterminer le type MIME
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        $mimeTypes = [
-            'jpg' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'gif' => 'image/gif',
-            'webp' => 'image/webp',
-        ];
-        $mimeType = $mimeTypes[strtolower($extension)] ?? 'application/octet-stream';
-        
-        return response($content)
-            ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'public, max-age=31536000');
-            
-    } catch (\Exception $e) {
-        \Log::error('R2 Proxy Error', ['path' => $path, 'error' => $e->getMessage()]);
-        abort(404);
-    }
-})->where('path', '.*');

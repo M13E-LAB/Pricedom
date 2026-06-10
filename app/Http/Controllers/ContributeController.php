@@ -87,151 +87,40 @@ class ContributeController extends Controller
         ]);
 
         try {
-            Log::info('🎫 Début analyse ticket avec OpenAI GPT-4 Vision');
+            Log::info('🎫 Début analyse ticket avec Claude Vision API');
             Log::info('📋 Request data', ['files' => $request->allFiles(), 'has_image' => $request->hasFile('ticket_image')]);
             
-            // Utiliser OpenAI API
-            $apiKey = env('OPENAI_API_KEY');
-            if (empty($apiKey)) {
-                Log::error('❌ OPENAI_API_KEY non configurée dans .env');
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Configuration API manquante. Veuillez configurer OpenAI.'
-                ], 500);
-            }
-            Log::info('🔑 Utilisation OpenAI GPT-4o-mini pour analyse ticket');
-
-            Log::info('🔑 Service d\'analyse disponible, début traitement image');
-
-            // Sauvegarder l'image temporairement
-            $imagePath = $request->file('ticket_image')->store('temp_tickets', 'public');
-            $fullImagePath = Storage::disk('public')->path($imagePath);
-            
-            if (!file_exists($fullImagePath)) {
-                throw new \Exception('Impossible de sauvegarder l\'image');
-            }
-            
-            $imageSize = filesize($fullImagePath);
-            Log::info('📷 Image sauvée', ['path' => $imagePath, 'size' => $imageSize]);
+            // Utiliser le service R2 pour uploader l'image
+            $r2Service = app(\App\Services\CloudflareR2Service::class);
+            $file = $request->file('ticket_image');
             
             // Compresser l'image si elle est trop lourde (>2MB)
+            $imageSize = $file->getSize();
             if ($imageSize > 2 * 1024 * 1024) {
                 Log::info('🗜️ Compression image nécessaire');
-                $this->compressImage($fullImagePath);
-                $imageSize = filesize($fullImagePath);
-                Log::info('✅ Image compressée', ['new_size' => $imageSize]);
+                $tempPath = $file->getRealPath();
+                $this->compressImage($tempPath);
+                Log::info('✅ Image compressée');
             }
             
-            $imageData = base64_encode(file_get_contents($fullImagePath));
-            Log::info('🔗 Image encodée en base64', ['length' => strlen($imageData)]);
+            // Uploader sur R2
+            $imageUrl = $r2Service->uploadFile($file, 'tickets');
+            Log::info('📷 Image uploadée sur R2', ['url' => $imageUrl]);
             
-            $ticketPrompt = "Tu es un expert en analyse de tickets de caisse. Analyse cette image de ticket et extrais TOUTES les informations des produits.
-
-Pour chaque produit trouvé, retourne un JSON avec cette structure exacte :
-{
-  \"store_info\": {
-    \"name\": \"nom du magasin\",
-    \"location\": \"adresse si visible\",
-    \"date\": \"date du ticket\"
-  },
-  \"products\": [
-    {
-      \"name\": \"nom exact du produit\",
-      \"price\": prix_en_euros,
-      \"quantity\": quantité,
-      \"category\": \"catégorie estimée (alimentaire/hygiène/etc)\"
-    }
-  ],
-  \"total\": montant_total
-}
-
-Instructions :
-- Extrais TOUS les produits visibles
-- Prix en format numérique (ex: 2.45)
-- Nom de produit exact du ticket
-- Si quantité non visible, mets 1
-- Ignore les lignes de sous-totaux, taxes, etc.
-- Retourne UNIQUEMENT le JSON, rien d'autre";
-
-            Log::info('🚀 Envoi pour analyse automatique avec OpenAI GPT-4o-mini (PHP direct)...');
-
-            // Utiliser directement l'API OpenAI depuis PHP (plus fiable que Python)
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(90)->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4o-mini',
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => [
-                            ['type' => 'text', 'text' => $ticketPrompt],
-                            [
-                                'type' => 'image_url',
-                                'image_url' => [
-                                    'url' => 'data:image/jpeg;base64,' . $imageData
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'max_tokens' => 2000,
-                'temperature' => 0.1
-            ]);
-
-            Log::info('📡 Réponse OpenAI reçue', ['status' => $response->status()]);
-
-            if ($response->failed()) {
-                Log::error('❌ Erreur API OpenAI', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                    'headers' => $response->headers()
-                ]);
-                Storage::disk('public')->delete($imagePath);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erreur API OpenAI: ' . $response->status() . ' - ' . substr($response->body(), 0, 200)
-                ], 500);
-            }
-
-            $responseData = $response->json();
+            // Analyser avec Claude
+            $claudeService = app(\App\Services\ClaudeService::class);
+            $jsonData = $claudeService->analyzeTicket($imageUrl);
             
-            if (!isset($responseData['choices'][0]['message']['content'])) {
-                Log::error('❌ Structure de réponse OpenAI invalide', ['response' => $responseData]);
-                Storage::disk('public')->delete($imagePath);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Format de réponse invalide.'
-                ], 500);
-            }
-
-            $content = $responseData['choices'][0]['message']['content'];
-            Log::info('📄 Contenu reçu d\'OpenAI', ['content' => substr($content, 0, 200)]);
-            
-            // Extraire le JSON
-            if (preg_match('/{.*}/s', $content, $matches)) {
-                $jsonData = json_decode($matches[0], true);
+            if ($jsonData && isset($jsonData['products'])) {
+                Log::info('✅ Ticket analysé avec succès par Claude', ['products_count' => count($jsonData['products'])]);
                 
-                if (json_last_error() === JSON_ERROR_NONE && isset($jsonData['products'])) {
-                    // Supprimer l'image temporaire
-                    Storage::disk('public')->delete($imagePath);
-                    
-                    Log::info('✅ Ticket analysé avec succès', ['products_count' => count($jsonData['products'])]);
-                    
-                    return response()->json([
-                        'success' => true,
-                        'data' => $jsonData
-                    ]);
-                } else {
-                    Log::error('❌ Format invalide ou pas de produits', ['json_error' => json_last_error_msg(), 'content' => $content]);
-                }
-            } else {
-                Log::error('❌ Pas de données trouvées dans la réponse', ['content' => $content]);
+                return response()->json([
+                    'success' => true,
+                    'data' => $jsonData
+                ]);
             }
             
-            // Supprimer l'image temporaire
-            Storage::disk('public')->delete($imagePath);
-            
+            Log::error('❌ Analyse ticket échouée ou format invalide');
             return response()->json([
                 'success' => false,
                 'message' => 'Impossible d\'analyser ce ticket. Assurez-vous que l\'image est claire et lisible.'
@@ -239,11 +128,6 @@ Instructions :
             
         } catch (\Exception $e) {
             Log::error('❌ Erreur analyse ticket: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            
-            // Nettoyer l'image temporaire si elle existe
-            if (isset($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
-            }
             
             return response()->json([
                 'success' => false,

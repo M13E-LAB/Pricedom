@@ -41,16 +41,16 @@ class ClaudeService
             // Ajouter l'image si disponible
             if ($imagePath) {
                 $imageData = $this->downloadAndEncodeImage($imagePath);
-                if ($imageData) {
+                if ($imageData && isset($imageData['data'])) {
                     $content[] = [
                         'type' => 'image',
                         'source' => [
                             'type' => 'base64',
-                            'media_type' => 'image/jpeg',
-                            'data' => $imageData
+                            'media_type' => $imageData['mime_type'] ?? 'image/jpeg',
+                            'data' => $imageData['data']
                         ]
                     ];
-                    Log::info('✅ Image ajoutée à l\'analyse Claude');
+                    Log::info('✅ Image ajoutée à l\'analyse Claude', ['mime' => $imageData['mime_type']]);
                 }
             }
             
@@ -106,6 +106,127 @@ class ClaudeService
     }
 
     /**
+     * Analyze receipt/ticket image for product extraction
+     */
+    public function analyzeTicket($imagePath)
+    {
+        try {
+            Log::info('🎫 Début analyse ticket avec Claude', ['path' => $imagePath]);
+            
+            if (empty($this->apiKey)) {
+                Log::error('❌ Claude API key not configured');
+                return null;
+            }
+
+            // Construire le message avec l'image
+            $content = [];
+            
+            // Télécharger et ajouter l'image
+            $imageData = $this->downloadAndEncodeImage($imagePath);
+            if (!$imageData || !isset($imageData['data'])) {
+                Log::error('❌ Impossible de charger l\'image du ticket');
+                return null;
+            }
+            
+            $content[] = [
+                'type' => 'image',
+                'source' => [
+                    'type' => 'base64',
+                    'media_type' => $imageData['mime_type'] ?? 'image/jpeg',
+                    'data' => $imageData['data']
+                ]
+            ];
+            Log::info('✅ Image ticket ajoutée à l\'analyse Claude');
+            
+            // Ajouter le prompt
+            $ticketPrompt = "Tu es un expert en analyse de tickets de caisse. Analyse cette image de ticket et extrais TOUTES les informations des produits.
+
+Pour chaque produit trouvé, retourne un JSON avec cette structure exacte :
+{
+  \"store_info\": {
+    \"name\": \"nom du magasin\",
+    \"location\": \"adresse si visible\",
+    \"date\": \"date du ticket\"
+  },
+  \"products\": [
+    {
+      \"name\": \"nom exact du produit\",
+      \"price\": prix_en_euros,
+      \"quantity\": quantité,
+      \"category\": \"catégorie estimée (alimentaire/hygiène/etc)\"
+    }
+  ],
+  \"total\": montant_total
+}
+
+Instructions :
+- Extrais TOUS les produits visibles
+- Prix en format numérique (ex: 2.45)
+- Nom de produit exact du ticket
+- Si quantité non visible, mets 1
+- Ignore les lignes de sous-totaux, taxes, etc.
+- Retourne UNIQUEMENT le JSON, rien d'autre";
+
+            $content[] = [
+                'type' => 'text',
+                'text' => $ticketPrompt
+            ];
+
+            $messages = [
+                [
+                    'role' => 'user',
+                    'content' => $content
+                ]
+            ];
+
+            $response = Http::withHeaders([
+                'x-api-key' => $this->apiKey,
+                'content-type' => 'application/json',
+                'anthropic-version' => '2023-06-01'
+            ])->timeout(90)->post($this->baseUrl . '/messages', [
+                'model' => $this->model,
+                'max_tokens' => 4096,
+                'messages' => $messages
+            ]);
+
+            Log::info('🤖 Claude ticket API response', [
+                'status' => $response->status(),
+                'successful' => $response->successful()
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $content = $data['content'][0]['text'] ?? '';
+                
+                Log::info('📄 Contenu reçu de Claude', ['content' => substr($content, 0, 200)]);
+                
+                // Extraire le JSON
+                if (preg_match('/{.*}/s', $content, $matches)) {
+                    $jsonData = json_decode($matches[0], true);
+                    
+                    if (json_last_error() === JSON_ERROR_NONE && isset($jsonData['products'])) {
+                        Log::info('✅ Ticket analysé avec succès par Claude', ['products_count' => count($jsonData['products'])]);
+                        return $jsonData;
+                    }
+                }
+            }
+
+            Log::error('❌ Claude Ticket API Error', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('❌ Claude Ticket Service Error', [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+            return null;
+        }
+    }
+
+    /**
      * Analyze nutrition from receipt text and/or image
      */
     public function analyzeNutrition($description, $imagePath = null)
@@ -117,16 +238,16 @@ class ClaudeService
             // Ajouter l'image si disponible
             if ($imagePath) {
                 $imageData = $this->downloadAndEncodeImage($imagePath);
-                if ($imageData) {
+                if ($imageData && isset($imageData['data'])) {
                     $content[] = [
                         'type' => 'image',
                         'source' => [
                             'type' => 'base64',
-                            'media_type' => 'image/jpeg',
-                            'data' => $imageData
+                            'media_type' => $imageData['mime_type'] ?? 'image/jpeg',
+                            'data' => $imageData['data']
                         ]
                     ];
-                    Log::info('✅ Image ajoutée à l\'analyse nutrition Claude');
+                    Log::info('✅ Image ajoutée à l\'analyse nutrition Claude', ['mime' => $imageData['mime_type']]);
                 }
             }
             
@@ -300,7 +421,7 @@ class ClaudeService
             Log::info('📥 Téléchargement image pour Claude', ['path' => $imagePath]);
             
             // Télécharger l'image depuis R2
-            $imageContent = Http::timeout(30)->get($imagePath);
+            $imageContent = Http::timeout(60)->get($imagePath);
             
             if (!$imageContent->successful()) {
                 Log::error('❌ Échec téléchargement image', [
@@ -310,11 +431,21 @@ class ClaudeService
                 return null;
             }
             
+            // Détecter le type MIME de l'image
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->buffer($imageContent->body());
+            
             // Encoder en base64
             $base64 = base64_encode($imageContent->body());
-            Log::info('✅ Image encodée en base64', ['size' => strlen($base64)]);
+            Log::info('✅ Image encodée en base64', [
+                'size' => strlen($base64),
+                'mime_type' => $mimeType
+            ]);
             
-            return $base64;
+            return [
+                'data' => $base64,
+                'mime_type' => $mimeType
+            ];
             
         } catch (\Exception $e) {
             Log::error('❌ Erreur encodage image', [

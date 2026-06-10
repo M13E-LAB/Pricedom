@@ -16,7 +16,8 @@ class CloudflareR2Service
     }
 
     /**
-     * Upload une image et retourne l'URL
+     * Upload une image et retourne le PATH (pas l'URL)
+     * L'URL sera générée au moment de l'affichage
      */
     public function uploadImage(UploadedFile $file, string $directory = 'images'): string
     {
@@ -31,7 +32,8 @@ class CloudflareR2Service
             throw new Exception('Failed to upload image to R2');
         }
 
-        return $this->getPublicUrl($path);
+        // Retourner seulement le path, pas l'URL complète
+        return $path;
     }
 
     /**

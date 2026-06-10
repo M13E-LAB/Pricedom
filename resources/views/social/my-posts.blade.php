@@ -102,22 +102,24 @@
                     <!-- Image du repas -->
                     <div class="relative">
                         @php
-                            // Si image_path est déjà une URL complète (R2), utiliser la route proxy
+                            // Gérer les différents formats d'image_path
                             if (str_starts_with($post->image_path, 'https://')) {
-                                // Extraire le chemin depuis l'URL R2
+                                // URL complète (anciens posts) - extraire le path
                                 $parsedUrl = parse_url($post->image_path);
                                 $path = ltrim($parsedUrl['path'], '/');
                                 
-                                // Supprimer le préfixe "zyma-files/" si présent
-                                if (str_starts_with($path, 'zyma-files/')) {
-                                    $path = substr($path, strlen('zyma-files/'));
-                                }
+                                // Supprimer tous les préfixes connus
+                                $path = preg_replace('#^(zyma-files/|r2-image/|r2-proxy/)#', '', $path);
+                                $path = urldecode($path);
                                 
-                                // Utiliser la route proxy pour servir l'image R2
+                                // Utiliser la route proxy
                                 $imageUrl = url('/r2-image/' . urlencode($path));
+                            } elseif (str_starts_with($post->image_path, 'storage/')) {
+                                // Chemin local storage
+                                $imageUrl = asset($post->image_path);
                             } else {
-                                // Sinon, c'est un chemin local, construire l'URL
-                                $imageUrl = asset('storage/' . $post->image_path);
+                                // Path relatif R2 (nouveau format) : posts/123.jpg
+                                $imageUrl = url('/r2-image/' . urlencode($post->image_path));
                             }
                         @endphp
                         <img src="{{ $imageUrl }}" 

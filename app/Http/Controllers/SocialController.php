@@ -70,8 +70,11 @@ class SocialController extends Controller
             \Log::info('📋 Analyse nutritionnelle avec Claude basée sur la description');
             
             
-            // Analyse nutritionnelle avec Claude
-            $nutritionAnalysis = $claudeService->analyzeNutrition($request->description ?? 'Repas uploadé');
+            // Analyse nutritionnelle avec Claude (avec image)
+            $nutritionAnalysis = $claudeService->analyzeNutrition(
+                $request->description ?? '', 
+                $post->image_path
+            );
             
             if ($nutritionAnalysis && isset($nutritionAnalysis['analysis'])) {
                 $post->nutrition_analysis = $nutritionAnalysis['analysis'];

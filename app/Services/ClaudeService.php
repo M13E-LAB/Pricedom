@@ -35,10 +35,36 @@ class ClaudeService
                 return $this->getDefaultAnalysis();
             }
 
+            // Construire le message avec ou sans image
+            $content = [];
+            
+            // Ajouter l'image si disponible
+            if ($imagePath) {
+                $imageData = $this->downloadAndEncodeImage($imagePath);
+                if ($imageData) {
+                    $content[] = [
+                        'type' => 'image',
+                        'source' => [
+                            'type' => 'base64',
+                            'media_type' => 'image/jpeg',
+                            'data' => $imageData
+                        ]
+                    ];
+                    Log::info('✅ Image ajoutée à l\'analyse Claude');
+                }
+            }
+            
+            // Ajouter le texte du prompt
+            $promptText = $this->buildFoodAnalysisPrompt($description, $imagePath);
+            $content[] = [
+                'type' => 'text',
+                'text' => $promptText
+            ];
+
             $messages = [
                 [
                     'role' => 'user',
-                    'content' => $this->buildFoodAnalysisPrompt($description, $imagePath)
+                    'content' => $content
                 ]
             ];
 
@@ -80,15 +106,41 @@ class ClaudeService
     }
 
     /**
-     * Analyze nutrition from receipt text
+     * Analyze nutrition from receipt text and/or image
      */
-    public function analyzeNutrition($description)
+    public function analyzeNutrition($description, $imagePath = null)
     {
         try {
+            // Construire le message avec ou sans image
+            $content = [];
+            
+            // Ajouter l'image si disponible
+            if ($imagePath) {
+                $imageData = $this->downloadAndEncodeImage($imagePath);
+                if ($imageData) {
+                    $content[] = [
+                        'type' => 'image',
+                        'source' => [
+                            'type' => 'base64',
+                            'media_type' => 'image/jpeg',
+                            'data' => $imageData
+                        ]
+                    ];
+                    Log::info('✅ Image ajoutée à l\'analyse nutrition Claude');
+                }
+            }
+            
+            // Ajouter le texte du prompt
+            $promptText = $this->buildNutritionPrompt($description, $imagePath);
+            $content[] = [
+                'type' => 'text',
+                'text' => $promptText
+            ];
+
             $messages = [
                 [
                     'role' => 'user',
-                    'content' => $this->buildNutritionPrompt($description)
+                    'content' => $content
                 ]
             ];
 
@@ -118,7 +170,16 @@ class ClaudeService
 
     private function buildFoodAnalysisPrompt($description, $imagePath = null)
     {
-        $prompt = "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n";
+        if ($imagePath && empty(trim($description))) {
+            // Si seulement l'image est fournie sans description
+            $prompt = "Tu es un nutritionniste expert. Analyse le repas visible dans cette image.\n\n";
+        } else if ($imagePath) {
+            // Si image + description
+            $prompt = "Tu es un nutritionniste expert. Analyse ce repas en te basant sur l'image et cette description : '{$description}'\n\n";
+        } else {
+            // Si seulement la description
+            $prompt = "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n";
+        }
         
         $prompt .= "Donne une analyse complète au format suivant :\n\n";
         $prompt .= "---\n\n";
@@ -134,17 +195,29 @@ class ClaudeService
         return $prompt;
     }
 
-    private function buildNutritionPrompt($description)
+    private function buildNutritionPrompt($description, $imagePath = null)
     {
-        return "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n" .
-               "Donne une analyse complète au format texte lisible avec :\n\n" .
-               "**🍽️ Repas identifié** : [nom du plat]\n\n" .
-               "**🔥 Calories** : [estimation] kcal\n" .
-               "**🥖 Glucides** : [estimation] g\n" .
-               "**🍗 Protéines** : [estimation] g\n" .
-               "**🥑 Lipides** : [estimation] g\n\n" .
-               "**💚 Score Santé** : [score]/10\n\n" .
-               "✍️ **Feedback** : [Ton analyse personnalisée avec conseils]";
+        if ($imagePath && empty(trim($description))) {
+            // Si seulement l'image est fournie sans description
+            $prompt = "Tu es un nutritionniste expert. Analyse le repas visible dans cette image.\n\n";
+        } else if ($imagePath) {
+            // Si image + description
+            $prompt = "Tu es un nutritionniste expert. Analyse ce repas en te basant sur l'image et cette description : '{$description}'\n\n";
+        } else {
+            // Si seulement la description
+            $prompt = "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n";
+        }
+        
+        $prompt .= "Donne une analyse complète au format texte lisible avec :\n\n" .
+                   "**🍽️ Repas identifié** : [nom du plat]\n\n" .
+                   "**🔥 Calories** : [estimation] kcal\n" .
+                   "**🥖 Glucides** : [estimation] g\n" .
+                   "**🍗 Protéines** : [estimation] g\n" .
+                   "**🥑 Lipides** : [estimation] g\n\n" .
+                   "**💚 Score Santé** : [score]/10\n\n" .
+                   "✍️ **Feedback** : [Ton analyse personnalisée avec conseils]";
+        
+        return $prompt;
     }
 
     private function parseFoodAnalysis($response)
@@ -216,5 +289,39 @@ class ClaudeService
             'calories_estimated' => null,
             'health_score' => 70
         ];
+    }
+
+    /**
+     * Télécharge l'image depuis R2 et l'encode en base64
+     */
+    private function downloadAndEncodeImage($imagePath)
+    {
+        try {
+            Log::info('📥 Téléchargement image pour Claude', ['path' => $imagePath]);
+            
+            // Télécharger l'image depuis R2
+            $imageContent = Http::timeout(30)->get($imagePath);
+            
+            if (!$imageContent->successful()) {
+                Log::error('❌ Échec téléchargement image', [
+                    'status' => $imageContent->status(),
+                    'path' => $imagePath
+                ]);
+                return null;
+            }
+            
+            // Encoder en base64
+            $base64 = base64_encode($imageContent->body());
+            Log::info('✅ Image encodée en base64', ['size' => strlen($base64)]);
+            
+            return $base64;
+            
+        } catch (\Exception $e) {
+            Log::error('❌ Erreur encodage image', [
+                'error' => $e->getMessage(),
+                'path' => $imagePath
+            ]);
+            return null;
+        }
     }
 }

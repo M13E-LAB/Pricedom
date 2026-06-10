@@ -11,6 +11,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- FIX MENU MOBILE - CSS INLINE POUR FORCER LA PRISE EN COMPTE -->
+    <style>
+        /* CACHE LE MENU MOBILE PAR DÉFAUT */
+        #mobileMenu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translateX(-100%) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #mobileMenu.active {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateX(0) !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen" style="background: var(--gradient-hero);">
     <nav class="glass-card sticky top-0 z-50 border-b border-white/20">

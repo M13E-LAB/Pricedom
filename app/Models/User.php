@@ -99,4 +99,10 @@ class User extends Authenticatable
     {
         return $this->badges()->latest()->first();
     }
+
+    public function isAdmin(): bool
+    {
+        // Pour l'instant, on peut définir l'admin par email ou ajouter un champ 'is_admin' plus tard
+        return $this->email === 'admin@pricedom.com' || $this->id === 1;
+    }
 }

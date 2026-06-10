@@ -47,13 +47,26 @@ class CloudflareR2Service
      */
     public function getPublicUrl(string $path): string
     {
+        // Utiliser l'URL publique configurée si disponible
+        $publicUrl = env('R2_PUBLIC_URL');
+        
+        if ($publicUrl) {
+            return rtrim($publicUrl, '/') . '/' . ltrim($path, '/');
+        }
+        
+        // Fallback : essayer d'utiliser l'URL du disk
         try {
-            return $this->disk->url($path);
+            $url = $this->disk->url($path);
+            // Si l'URL contient r2.cloudflarestorage.com, on doit la remplacer par une URL publique
+            // Pour l'instant, on va créer une route proxy locale
+            if (strpos($url, 'r2.cloudflarestorage.com') !== false) {
+                // Retourner une URL qui passera par un proxy local
+                return env('APP_URL', 'http://localhost') . '/r2-proxy/' . urlencode($path);
+            }
+            return $url;
         } catch (Exception $e) {
-            // Fallback avec format R2 correct
-            $bucket = env('R2_BUCKET', 'zyma-files');
-            $accountId = env('R2_ACCOUNT_ID', '0650ad87c8bc19f6312144dc1f66f405');
-            return "https://{$bucket}.{$accountId}.r2.cloudflarestorage.com/{$path}";
+            // Si tout échoue, retourner URL proxy
+            return env('APP_URL', 'http://localhost') . '/r2-proxy/' . urlencode($path);
         }
     }
 

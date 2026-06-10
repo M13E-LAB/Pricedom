@@ -874,3 +874,33 @@ Route::get('/fix-openai-api', function () {
            '<a href="/social" style="background: #ff6b35; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🍽️ Voir le Feed</a> ' .
            '<a href="/fix-openai-api" style="background: #32cd32; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">🔄 Re-essayer</a>';
 });
+
+// Route proxy pour servir les images R2 publiquement
+Route::get('/r2-proxy/{path}', function ($path) {
+    try {
+        $path = urldecode($path);
+        $r2Service = app(\App\Services\CloudflareR2Service::class);
+        
+        // Récupérer le contenu depuis R2
+        $content = Storage::disk('r2')->get($path);
+        
+        // Déterminer le type MIME
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $mimeTypes = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+        ];
+        $mimeType = $mimeTypes[strtolower($extension)] ?? 'application/octet-stream';
+        
+        return response($content)
+            ->header('Content-Type', $mimeType)
+            ->header('Cache-Control', 'public, max-age=31536000');
+            
+    } catch (\Exception $e) {
+        \Log::error('R2 Proxy Error', ['path' => $path, 'error' => $e->getMessage()]);
+        abort(404);
+    }
+})->where('path', '.*');

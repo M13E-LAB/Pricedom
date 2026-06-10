@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ClaudeService
 {
@@ -420,23 +421,51 @@ Instructions :
         try {
             Log::info('📥 Téléchargement image pour Claude', ['path' => $imagePath]);
             
-            // Télécharger l'image depuis R2
-            $imageContent = Http::timeout(60)->get($imagePath);
+            // Si c'est une URL complète, extraire le path R2
+            if (strpos($imagePath, 'http') === 0) {
+                // Extraire le path depuis l'URL
+                // Format: https://domain.com/r2-proxy/posts/filename.jpg
+                // ou: https://bucket.r2.cloudflarestorage.com/posts/filename.jpg
+                
+                if (strpos($imagePath, '/r2-proxy/') !== false) {
+                    // URL proxy locale
+                    $path = substr($imagePath, strpos($imagePath, '/r2-proxy/') + 10);
+                    $path = urldecode($path);
+                } elseif (strpos($imagePath, 'r2.cloudflarestorage.com') !== false) {
+                    // URL R2 directe - extraire le path après le bucket
+                    $parts = parse_url($imagePath);
+                    $path = ltrim($parts['path'] ?? '', '/');
+                    // Supprimer le nom du bucket s'il est présent dans le path
+                    $bucket = env('R2_BUCKET', 'zyma-files');
+                    if (strpos($path, $bucket . '/') === 0) {
+                        $path = substr($path, strlen($bucket) + 1);
+                    }
+                } else {
+                    // Autre format d'URL
+                    Log::error('❌ Format URL non reconnu', ['url' => $imagePath]);
+                    return null;
+                }
+            } else {
+                // C'est déjà un path R2
+                $path = $imagePath;
+            }
             
-            if (!$imageContent->successful()) {
-                Log::error('❌ Échec téléchargement image', [
-                    'status' => $imageContent->status(),
-                    'path' => $imagePath
-                ]);
+            Log::info('📂 Path R2 extrait', ['path' => $path]);
+            
+            // Lire directement depuis R2
+            $imageContent = \Storage::disk('r2')->get($path);
+            
+            if (!$imageContent) {
+                Log::error('❌ Image introuvable dans R2', ['path' => $path]);
                 return null;
             }
             
             // Détecter le type MIME de l'image
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($imageContent->body());
+            $mimeType = $finfo->buffer($imageContent);
             
             // Encoder en base64
-            $base64 = base64_encode($imageContent->body());
+            $base64 = base64_encode($imageContent);
             Log::info('✅ Image encodée en base64', [
                 'size' => strlen($base64),
                 'mime_type' => $mimeType
@@ -450,7 +479,8 @@ Instructions :
         } catch (\Exception $e) {
             Log::error('❌ Erreur encodage image', [
                 'error' => $e->getMessage(),
-                'path' => $imagePath
+                'path' => $imagePath,
+                'trace' => $e->getTraceAsString()
             ]);
             return null;
         }

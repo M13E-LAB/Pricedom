@@ -68,7 +68,8 @@
             "ext-gd": "8.2.31",
             "ext-pdo_pgsql": "8.2.31",
             "ext-zip": "8.2.31"
-        }
+        },
+        "platform-check": false
     },
     "minimum-stability": "stable",
     "prefer-stable": true

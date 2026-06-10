@@ -183,18 +183,20 @@ Affiche les résultats comme ceci :
                 
                 // Analyse de santé pour la ligue
                 try {
+                    \Log::info('🤖 Démarrage analyse santé Claude', ['description' => $request->description]);
                     $healthService = app(HealthAnalysisService::class);
                     $healthAnalysis = $healthService->analyzePost($request->description ?? '', $post->image_path);
                     
                     $post->health_score = $healthAnalysis['score'];
                     $post->health_analysis = $healthAnalysis;
                     
-                    \Log::info('🏆 Analyse santé calculée', [
+                    \Log::info('✅ Analyse santé Claude terminée', [
                         'score' => $healthAnalysis['score'],
-                        'category' => $healthAnalysis['category']
+                        'category' => $healthAnalysis['category'] ?? 'N/A',
+                        'claude_powered' => $healthAnalysis['claude_powered'] ?? false
                     ]);
                 } catch (\Exception $e) {
-                    \Log::error('❌ Erreur analyse santé: ' . $e->getMessage());
+                    \Log::error('❌ Erreur analyse santé Claude: ' . $e->getMessage());
                     // Valeurs par défaut si l'analyse échoue
                     $post->health_score = 50;
                     $post->health_analysis = ['score' => 50, 'category' => 'Non analysé'];

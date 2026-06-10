@@ -61,158 +61,53 @@ class SocialController extends Controller
         ]);
 
         try {
-            \Log::info('🚀 Début analyse OpenAI pour post #' . $post->id);
+            \Log::info('🤖 Début analyse Claude complète pour post #' . $post->id);
             
-            // Configuration de la clé API OpenAI depuis les variables d'environnement
-            $apiKey = env('OPENAI_API_KEY');
-            if (empty($apiKey)) {
-                throw new \Exception('OPENAI_API_KEY non configurée. Veuillez définir cette variable d\'environnement.');
+            // Utiliser Claude au lieu d'OpenAI
+            $claudeService = app(\App\Services\ClaudeService::class);
+
+            // Analyse avec Claude (plus besoin de télécharger l'image pour l'instant)
+            \Log::info('📋 Analyse nutritionnelle avec Claude basée sur la description');
+            
+            
+            // Analyse nutritionnelle avec Claude
+            $nutritionAnalysis = $claudeService->analyzeNutrition($request->description ?? 'Repas uploadé');
+            
+            if ($nutritionAnalysis && isset($nutritionAnalysis['analysis'])) {
+                $post->nutrition_analysis = $nutritionAnalysis['analysis'];
+                \Log::info('💾 Analyse nutritionnelle Claude sauvegardée');
             }
-            \Log::info('🔑 Utilisation clé API OpenAI depuis environnement');
 
-            // Télécharger l'image depuis R2 et l'encoder en base64 pour OpenAI
-            \Log::info('📥 Téléchargement image depuis R2 via service pour analyse');
-            
-            // Extraire le chemin relatif depuis l'URL R2
-            $r2Service = new \App\Services\CloudflareR2Service();
-            $parsedUrl = parse_url($post->image_path);
-            $path = ltrim($parsedUrl['path'], '/');
-            
-            // Supprimer le préfixe "zyma-files/" si présent
-            if (str_starts_with($path, 'zyma-files/')) {
-                $path = substr($path, strlen('zyma-files/'));
-            }
-            
-            \Log::info('🔍 Chemin extrait pour R2: ' . $path);
-            
-            // Télécharger via le service R2 avec credentials
-            $imageContent = $r2Service->getContent($path);
-            
-            if (!$imageContent) {
-                \Log::error('❌ Impossible de télécharger l\'image R2 via service');
-                throw new \Exception('Impossible d\'accéder à l\'image pour l\'analyse');
-            }
-            
-            $imageData = base64_encode($imageContent);
-            \Log::info('✅ Image téléchargée via R2 Service et encodée', ['size_kb' => number_format(strlen($imageData)/1024, 1)]);
-            
-            $advancedPrompt = "Tu es l'assistant nutritionnel de l'app **Zyma**, qui aide les gens à mieux manger grâce à une photo de leur repas.
-
-Voici une photo de repas : {image}
-
-Ta mission :
-
-1. À partir de cette photo uniquement :
-    - Identifie chaque aliment.
-    - Estime les **quantités** en grammes ou millilitres.
-2. Génère une fiche nutritionnelle simple, dans ce format :
-    - **Calories** : {nombre} kcal
-    - **Glucides** : {g}
-    - **Protéines** : {g}
-    - **Lipides** : {g}
-    - **Score Santé Zyma** : sur 10 (1 = très mauvais, 10 = excellent)
-    → Prends en compte : fibres, protéines, sucres ajoutés, sel, gras saturés, additifs, aliments ultra-transformés.
-3. Rédige un **court retour personnalisé** (3 à 4 lignes max), en langage naturel, bienveillant et motivant :
-    - Félicite si c'est un bon choix ;
-    - Donne 1 à 2 **conseils simples** si le repas peut être amélioré ;
-    - Pas de termes techniques ni culpabilisants.
-
-❗ Ne fais pas de supposition sur les quantités non visibles. Ne commente que ce qui est visible.
-
-Affiche les résultats comme ceci :
-
----
-
-**🍽️ Repas identifié** : {nom simple du plat}
-
-**🔥 Calories** : {kcal} kcal
-
-**🥖 Glucides** : {g} g
-
-**🍗 Protéines** : {g} g
-
-**🥑 Lipides** : {g} g
-
-**💚 Score Santé Zyma** : {x}/10
-
-✍️ **Feedback** :
-
-{analyse concise et humaine, exemple : \"Repas gourmand mais un peu sucré. Ajouter une source de protéines ou quelques fruits frais pourrait mieux équilibrer.\"}";
-
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(90)->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4o',
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => [
-                            ['type' => 'text', 'text' => $advancedPrompt],
-                            [
-                                'type' => 'image_url',
-                                'image_url' => [
-                                    'url' => 'data:image/jpeg;base64,' . $imageData
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'max_tokens' => 800,
-                'temperature' => 0.7
-            ]);
-
-            \Log::info('📥 Réponse OpenAI brute', ['response' => $response->body()]);
-
-            if ($response->failed()) {
-                \Log::error('❌ Erreur API OpenAI', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
+            // Analyse de santé pour la ligue (Claude aussi)
+            try {
+                \Log::info('🤖 Démarrage analyse santé Claude', ['description' => $request->description]);
+                $healthService = app(HealthAnalysisService::class);
+                $healthAnalysis = $healthService->analyzePost($request->description ?? '', $post->image_path);
+                
+                $post->health_score = $healthAnalysis['score'];
+                $post->health_analysis = $healthAnalysis;
+                
+                \Log::info('✅ Analyse santé Claude terminée', [
+                    'score' => $healthAnalysis['score'],
+                    'category' => $healthAnalysis['category'] ?? 'N/A',
+                    'claude_powered' => $healthAnalysis['claude_powered'] ?? false
                 ]);
-                throw new \Exception('Erreur API OpenAI: ' . $response->body());
+            } catch (\Exception $e) {
+                \Log::error('❌ Erreur analyse santé Claude: ' . $e->getMessage());
+                $post->health_score = 50;
+                $post->health_analysis = ['score' => 50, 'category' => 'Non analysé'];
             }
-
-            $responseData = $response->json();
             
-            if (isset($responseData['choices'][0]['message']['content'])) {
-                $content = $responseData['choices'][0]['message']['content'];
-                \Log::info('✨ Contenu OpenAI reçu', ['content' => $content]);
-                
-                // Sauvegarder directement le contenu formaté
-                $post->nutrition_analysis = $content;
-                
-                // Analyse de santé pour la ligue
-                try {
-                    \Log::info('🤖 Démarrage analyse santé Claude', ['description' => $request->description]);
-                    $healthService = app(HealthAnalysisService::class);
-                    $healthAnalysis = $healthService->analyzePost($request->description ?? '', $post->image_path);
-                    
-                    $post->health_score = $healthAnalysis['score'];
-                    $post->health_analysis = $healthAnalysis;
-                    
-                    \Log::info('✅ Analyse santé Claude terminée', [
-                        'score' => $healthAnalysis['score'],
-                        'category' => $healthAnalysis['category'] ?? 'N/A',
-                        'claude_powered' => $healthAnalysis['claude_powered'] ?? false
-                    ]);
-                } catch (\Exception $e) {
-                    \Log::error('❌ Erreur analyse santé Claude: ' . $e->getMessage());
-                    // Valeurs par défaut si l'analyse échoue
-                    $post->health_score = 50;
-                    $post->health_analysis = ['score' => 50, 'category' => 'Non analysé'];
-                }
-                
-                $post->save();
-                \Log::info('✅ Analyse nutritionnelle et santé sauvegardées');
-            } else {
-                \Log::error('❌ Structure de réponse OpenAI invalide', ['response' => $responseData]);
-                throw new \Exception('Structure de réponse OpenAI invalide');
-            }
+            $post->save();
+            \Log::info('✅ Post sauvegardé avec analyses Claude');
             
         } catch (\Exception $e) {
-            \Log::error('❌ Exception lors de l\'analyse: ' . $e->getMessage(), [
+            \Log::error('❌ Exception lors de l\'analyse Claude: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
+            
+            // Fallback : sauvegarder le post sans analyse
+            $post->save();
         }
 
         return redirect()->route('social.index')->with('success', 'Votre repas a été partagé avec succès ! 🍽️');

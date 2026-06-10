@@ -704,13 +704,18 @@ Route::get('/r2-image/{path}', function ($path) {
         ];
         $mimeType = $mimeTypes[strtolower($extension)] ?? 'image/jpeg';
         
-        return response($imageContent)
+        \Log::info('✅ R2 Image served', ['path' => $path, 'size' => strlen($content)]);
+        
+        return response($content)
             ->header('Content-Type', $mimeType)
-            ->header('Cache-Control', 'public, max-age=31536000') // Cache 1 an
-            ->header('Content-Length', strlen($imageContent));
+            ->header('Cache-Control', 'public, max-age=31536000');
             
     } catch (\Exception $e) {
-        \Log::error('Erreur proxy R2 image: ' . $e->getMessage());
+        \Log::error('❌ R2 Proxy Error', [
+            'path' => $path,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
         abort(404, 'Image not accessible');
     }
 })->where('path', '.*');

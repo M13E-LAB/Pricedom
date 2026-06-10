@@ -118,30 +118,33 @@ class ClaudeService
 
     private function buildFoodAnalysisPrompt($description, $imagePath = null)
     {
-        $prompt = "Analyse ce repas et donne-moi un score de santé de 0 à 100:\n\n";
-        $prompt .= "Description: {$description}\n\n";
+        $prompt = "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n";
         
-        if ($imagePath && file_exists(public_path($imagePath))) {
-            // Pour l'instant, on se base sur la description
-            // Plus tard on pourra ajouter l'analyse d'image
-            $prompt .= "Une image est disponible mais l'analyse se base sur la description.\n\n";
-        }
-        
-        $prompt .= "Réponds au format JSON avec:\n";
-        $prompt .= "{\n";
-        $prompt .= '  "score": 75,';
-        $prompt .= '  "category": "healthy|moderate|unhealthy",';
-        $prompt .= '  "recommendations": "Conseils personnalisés"';
-        $prompt .= "}\n";
+        $prompt .= "Donne une analyse complète au format suivant :\n\n";
+        $prompt .= "---\n\n";
+        $prompt .= "**🍽️ Repas identifié** : [nom du plat]\n\n";
+        $prompt .= "**🔥 Calories** : [estimation] kcal\n\n";
+        $prompt .= "**🥖 Glucides** : [estimation] g\n\n";
+        $prompt .= "**🍗 Protéines** : [estimation] g\n\n";
+        $prompt .= "**🥑 Lipides** : [estimation] g\n\n";
+        $prompt .= "**💚 Score Santé** : [score]/10\n\n";
+        $prompt .= "✍️ **Feedback** :\n\n";
+        $prompt .= "[Ton analyse personnalisée du repas avec conseils]";
 
         return $prompt;
     }
 
     private function buildNutritionPrompt($description)
     {
-        return "Analyse nutritionnelle détaillée de ce repas/produit:\n\n{$description}\n\n" .
-               "Réponds en JSON avec calories, protéines, glucides, lipides, fibres, sucres, sel, " .
-               "vitamines principales, et conseils nutritionnels personnalisés.";
+        return "Tu es un nutritionniste expert. Analyse ce repas : '{$description}'\n\n" .
+               "Donne une analyse complète au format texte lisible avec :\n\n" .
+               "**🍽️ Repas identifié** : [nom du plat]\n\n" .
+               "**🔥 Calories** : [estimation] kcal\n" .
+               "**🥖 Glucides** : [estimation] g\n" .
+               "**🍗 Protéines** : [estimation] g\n" .
+               "**🥑 Lipides** : [estimation] g\n\n" .
+               "**💚 Score Santé** : [score]/10\n\n" .
+               "✍️ **Feedback** : [Ton analyse personnalisée avec conseils]";
     }
 
     private function parseFoodAnalysis($response)
@@ -163,9 +166,9 @@ class ClaudeService
 
     private function parseNutritionAnalysis($response)
     {
-        // Parse la réponse nutrition de Claude
+        // Retourne directement le texte formaté de Claude
         return [
-            'analysis' => $response,
+            'analysis' => $response, // Texte formaté prêt à afficher
             'calories_estimated' => $this->extractCalories($response),
             'health_score' => $this->calculateHealthScore($response)
         ];

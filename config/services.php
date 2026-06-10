@@ -41,7 +41,7 @@ return [
 
     'claude' => [
         'api_key' => env('CLAUDE_API_KEY'),
-        'model' => env('CLAUDE_MODEL', 'claude-3-5-sonnet-latest'),
+        'model' => env('CLAUDE_MODEL', 'claude-sonnet-4-6'),
     ],
 
 ];

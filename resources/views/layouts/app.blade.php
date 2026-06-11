@@ -12,7 +12,7 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- FIX MENU MOBILE - CSS INLINE POUR FORCER LA PRISE EN COMPTE -->
+    <!-- FIX MENU MOBILE + STYLE NAVBAR - CSS INLINE -->
     <style>
         /* CACHE LE MENU MOBILE PAR DÉFAUT */
         #mobileMenu {
@@ -36,6 +36,38 @@
             opacity: 1 !important;
             visibility: visible !important;
             transform: translateX(0) !important;
+        }
+
+        /* STYLE NAVBAR - FOND BLANC TEXTE NOIR */
+        nav.glass-card {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        nav .text-hero, nav a, nav button, nav span {
+            color: #111827 !important;
+        }
+
+        nav .nav-link {
+            color: #374151 !important;
+            font-weight: 600 !important;
+        }
+
+        nav .nav-link:hover {
+            color: #f97316 !important;
+            background: rgba(249, 115, 22, 0.08) !important;
+        }
+
+        nav .icon, nav i[data-lucide] {
+            color: #374151 !important;
+            stroke: #374151 !important;
+        }
+
+        nav .nav-link:hover .icon, nav .nav-link:hover i[data-lucide] {
+            color: #f97316 !important;
+            stroke: #f97316 !important;
         }
     </style>
 </head>

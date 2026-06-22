@@ -71,7 +71,8 @@
         }
     </style>
 </head>
-<body class="min-h-screen" style="background: var(--gradient-hero);">
+<body class="min-h-screen" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);">
+
     <nav class="glass-card sticky top-0 z-50 border-b border-white/20">
         <div class="container mx-auto px-6">
             <div class="flex justify-between items-center h-20">

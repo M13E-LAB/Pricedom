@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen relative overflow-hidden" style="background: var(--gradient-hero);">
+<div class="min-h-screen relative overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);">
     <!-- Background Elements -->
     <div class="absolute inset-0 overflow-hidden">
         <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-orange-400/20 to-pink-500/20 rounded-full blur-3xl"></div>
@@ -13,7 +13,7 @@
         <div class="text-center w-full max-w-4xl">
             <!-- Logo Section Premium -->
             <div class="mb-12 flex flex-col items-center justify-center animate-fade-in-up">
-                <div class="card-floating p-6 mb-8">
+                <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-6 mb-8">
                     <div class="flex items-center justify-center space-x-4">
                         <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-pink-500 rounded-2xl p-3 flex items-center justify-center shadow-lg relative overflow-hidden">
                             <img src="https://yt3.googleusercontent.com/N6sgOb1BI-mBIuB0N2OMss9hhbI7zNVk9EKYY7QGj-2TOFFWTFpvM6uFmgj0TXsSovAXe1Vwxw=s900-c-k-c0x00ffffff-no-rj" 
@@ -22,11 +22,11 @@
                             <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                         </div>
                         <div class="text-left">
-                            <div class="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full mb-2">
-                                <i data-lucide="sparkles" class="w-4 h-4 text-orange-500"></i>
-                                <span class="text-sm font-medium text-orange-600">Powered by</span>
+                            <div class="inline-flex items-center space-x-2 bg-orange-500/20 backdrop-blur-sm px-4 py-2 rounded-full mb-2 border border-orange-400/30">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-orange-300"></i>
+                                <span class="text-sm font-medium text-orange-200">Powered by</span>
                             </div>
-                            <h4 class="text-hero font-bold tracking-wide">ETCHELAST</h4>
+                            <h4 class="text-2xl font-bold tracking-wide bg-gradient-to-r from-orange-300 to-pink-300 bg-clip-text text-transparent">ETCHELAST</h4>
                         </div>
                     </div>
                 </div>
@@ -35,16 +35,16 @@
 
             <!-- Hero Content -->
             <div class="mb-12 animate-fade-in-up" style="animation-delay: 0.2s;">
-                <h1 class="text-display-1 mb-6 leading-tight">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white">
                     The Food Intelligence
                     <br>
-                    <span class="text-hero">& Nutrition AI-powered platform</span>
+                    <span class="bg-gradient-to-r from-orange-400 via-pink-400 to-orange-500 bg-clip-text text-transparent">& Nutrition AI-powered platform</span>
                 </h1>
                 
-                <div class="glass-card p-6 mb-8 max-w-2xl mx-auto">
-                    <p class="text-body-lg text-neutral-700 leading-relaxed">
+                <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6 mb-8 max-w-2xl mx-auto">
+                    <p class="text-lg md:text-xl text-white/90 leading-relaxed font-medium">
                         Rejoignez la communauté nutrition qui révolutionne votre façon de manger sainement.
-                        <span class="text-body text-neutral-600 block mt-2">
+                        <span class="text-base md:text-lg text-white/70 block mt-3">
                             Découvrez, comparez et partagez vos trouvailles nutrition
                         </span>
                     </p>
@@ -54,17 +54,17 @@
             <!-- Stats Section Premium -->
             <div class="mb-12 animate-fade-in-up" style="animation-delay: 0.4s;">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
-                    <div class="card-stats">
-                        <div class="text-3xl font-bold text-hero mb-2">10K+</div>
-                        <div class="text-caption">Produits</div>
+                    <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6 hover:scale-105 transition-transform">
+                        <div class="text-4xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent mb-2">10K+</div>
+                        <div class="text-sm font-semibold text-white/80 uppercase tracking-wide">Produits</div>
                     </div>
-                    <div class="card-stats">
-                        <div class="text-3xl font-bold text-hero mb-2">50K+</div>
-                        <div class="text-caption">Prix</div>
+                    <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6 hover:scale-105 transition-transform">
+                        <div class="text-4xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent mb-2">50K+</div>
+                        <div class="text-sm font-semibold text-white/80 uppercase tracking-wide">Prix</div>
                     </div>
-                    <div class="card-stats">
-                        <div class="text-3xl font-bold text-hero mb-2">100+</div>
-                        <div class="text-caption">Magasins</div>
+                    <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6 hover:scale-105 transition-transform">
+                        <div class="text-4xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent mb-2">100+</div>
+                        <div class="text-sm font-semibold text-white/80 uppercase tracking-wide">Magasins</div>
                     </div>
                 </div>
             </div>
